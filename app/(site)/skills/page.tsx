@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Code2, Terminal, Database, Cpu } from "lucide-react";
+import { Code2, Cloud, Bot, ShieldCheck } from "lucide-react";
 import { SkillStackIcon } from "@/components/skills/skill-stack-icon";
 import { Container } from "@/components/zippystarter/container";
 import { skills } from "@/lib/portfolio-data";
@@ -86,19 +86,19 @@ export default function SkillsPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 border border-border bg-background flex flex-col items-center justify-center aspect-square hover:border-primary transition-colors">
               <Code2 className="h-8 w-8 mb-2 text-primary" />
-              <span className="font-mono text-xs">SECURE_APIS</span>
+              <span className="font-mono text-xs">FULL_STACK_ENG</span>
             </div>
             <div className="p-4 border border-border bg-background flex flex-col items-center justify-center aspect-square hover:border-primary transition-colors">
-              <Database className="h-8 w-8 mb-2 text-primary" />
-              <span className="font-mono text-xs">SQL_AND_NOSQL</span>
+              <Cloud className="h-8 w-8 mb-2 text-primary" />
+              <span className="font-mono text-xs">DEVOPS_CLOUD</span>
             </div>
             <div className="p-4 border border-border bg-background flex flex-col items-center justify-center aspect-square hover:border-primary transition-colors">
-              <Cpu className="h-8 w-8 mb-2 text-primary" />
-              <span className="font-mono text-xs">EVENT_DRIVEN</span>
+              <Bot className="h-8 w-8 mb-2 text-primary" />
+              <span className="font-mono text-xs">AI_AUTOMATION</span>
             </div>
             <div className="p-4 border border-border bg-background flex flex-col items-center justify-center aspect-square hover:border-primary transition-colors">
-              <Terminal className="h-8 w-8 mb-2 text-primary" />
-              <span className="font-mono text-xs">CI_CD_DEVOPS</span>
+              <ShieldCheck className="h-8 w-8 mb-2 text-primary" />
+              <span className="font-mono text-xs">SECURE_SYSTEMS</span>
             </div>
           </div>
         </div>

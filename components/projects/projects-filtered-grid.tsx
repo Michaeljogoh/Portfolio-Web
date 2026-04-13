@@ -267,11 +267,7 @@ export function ProjectsFilteredGrid({ projects }: Props) {
                 aria-busy={searchPending}
               />
             </div>
-            {searchPending ? (
-              <p className="font-mono text-[10px] text-muted-foreground">
-                Filtering…
-              </p>
-            ) : null}
+  
           </div>
           {hasActiveFilters ? (
             <Button
