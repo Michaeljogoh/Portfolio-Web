@@ -1,5 +1,12 @@
 import type { ProjectCategoryId } from "@/lib/project-categories";
 import type { CertificationCategoryId } from "@/lib/cert-categories";
+import type {
+  Certification,
+  ExperienceEntry,
+  Project,
+} from "@/lib/portfolio-types";
+
+export type { Certification, ExperienceEntry, Project } from "@/lib/portfolio-types";
 
 export const SOCIAL = {
   github: "https://github.com/Michaeljogoh",
@@ -9,16 +16,6 @@ export const SOCIAL = {
   phoneTel: "tel:+2347034348894",
   phoneDisplay: "+234 703 434 8894",
 } as const;
-
-export type Project = {
-  title: string;
-  description: string;
-  tags: string[];
-  categories: ProjectCategoryId[];
-  image: string;
-  link: string;
-  repo: string;
-};
 
 export const projects: Project[] = [
   {
@@ -59,9 +56,9 @@ export const projects: Project[] = [
   },
 ];
 
-export type SkillGroup = { category: string; items: string[] };
+export type SkillGroupStatic = { category: string; items: string[] };
 
-export const skills: SkillGroup[] = [
+export const skills: SkillGroupStatic[] = [
   {
     category: "Backend & API",
     items: [
@@ -199,14 +196,6 @@ export const skills: SkillGroup[] = [
   },
 ];
 
-export type ExperienceEntry = {
-  title: string;
-  date: string;
-  readTime: string;
-  excerpt: string;
-  logo?: string;
-};
-
 export const experience: ExperienceEntry[] = [
   {
     title: "Full Stack Engineer — RocketDevs",
@@ -251,18 +240,6 @@ export const experience: ExperienceEntry[] = [
       "SQL and NoSQL schema work and query optimization; Git/GitHub workflows, branching, and merge conflict resolution.",
   },
 ];
-
-export type Certification = {
-  title: string;
-  issuer: string;
-  issued: string;
-  excerpt: string;
-  tags: string[];
-  categories: CertificationCategoryId[];
-  image: string;
-  /** Credential, badge URL, or # if not public. */
-  credentialUrl: string;
-};
 
 export const certifications: Certification[] = [
   {

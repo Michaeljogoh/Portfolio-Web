@@ -16,8 +16,8 @@ export default function Home() {
   return (
     <>
       <Container
+        siteWidth="content"
         wrapperClassName="relative min-h-screen flex flex-col justify-center pt-20 md:pt-24 pb-16 md:pb-24 overflow-hidden border-b border-border/50"
-        className="w-full max-w-none flex-1"
       >
         <div
           aria-hidden

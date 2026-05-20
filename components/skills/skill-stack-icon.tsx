@@ -1,15 +1,16 @@
-import { SKILL_ICON_SRC } from "@/lib/skill-icon-src";
+import { getSkillIconUrlSync } from "@/lib/skill-icon-resolver";
 
 type Props = {
   skill: string;
+  iconUrl?: string | null;
 };
 
-export function SkillStackIcon({ skill }: Props) {
-  const src = SKILL_ICON_SRC[skill];
+export function SkillStackIcon({ skill, iconUrl }: Props) {
+  const src = iconUrl ?? getSkillIconUrlSync(skill);
   if (!src) return null;
 
   return (
-    <img    
+    <img
       src={src}
       alt=""
       width={20}
