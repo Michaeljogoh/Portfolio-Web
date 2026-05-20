@@ -33,6 +33,30 @@ pnpm dev
 
 Open [http://localhost:3002](http://localhost:3002) in your browser (port is set in `package.json`).
 
+## Admin CMS (PostgreSQL + Prisma + JWT)
+
+1. Copy `.env.example` to `.env.local` and set `DATABASE_URL`, `JWT_SECRET` (32+ chars), `ADMIN_EMAIL`, and `ADMIN_PASSWORD`.
+2. Create the database schema and seed mock data:
+
+```bash
+pnpm db:push
+pnpm db:seed
+```
+
+3. Sign in at [http://localhost:3002/login](http://localhost:3002/login) (not linked from the public site).
+4. Manage content at `/admin` — projects, skills (categories + auto icons), experience, and certifications.
+
+Without `DATABASE_URL`, public pages fall back to static data in `lib/portfolio-data.ts`.
+
+## Contact form
+
+The `/contact` page sends email via [Postmark](https://postmarkapp.com). Add to `.env.local`:
+
+- `POSTMARK_SERVER_TOKEN` — Server API token from your Postmark server
+- `CONTACT_TO_EMAIL` — where inquiries are delivered (defaults to your portfolio email)
+- `CONTACT_FROM_EMAIL` — must match a verified Sender Signature in Postmark
+- `POSTMARK_MESSAGE_STREAM` — optional (defaults to `outbound`)
+
 ## Notes
 
 This template uses modern CSS features such as CSS Grid, Subgrid, and `mix-blend-mode`.

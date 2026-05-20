@@ -21,7 +21,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import type { Certification } from "@/lib/portfolio-data";
+import type { Certification } from "@/lib/portfolio-types";
 import {
   CERTIFICATION_CATEGORIES,
   type CertificationCategoryId,
@@ -380,7 +380,7 @@ export function CertificationsFilteredGrid({
         <>
           <div ref={resultsAnchorRef} className="scroll-mt-24" aria-hidden />
           {cardView === "row" ? (
-            <div className="mx-auto flex w-full max-w-7xl flex-col gap-5">
+            <div className="flex w-full flex-col gap-5">
               {pagedFiltered.map((cert) => (
                 <Card
                   key={`${cert.title}-${cert.issued}`}
@@ -420,7 +420,7 @@ export function CertificationsFilteredGrid({
               ))}
             </div>
           ) : (
-            <div className="mx-auto grid w-full max-w-7xl grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-6">
+            <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-6">
               {pagedFiltered.map((cert) => (
                 <Card
                   key={`${cert.title}-${cert.issued}`}
@@ -457,7 +457,7 @@ export function CertificationsFilteredGrid({
           )}
           {totalPages > 1 ? (
             <nav
-              className="mx-auto flex w-full max-w-7xl flex-col items-center justify-center gap-4 border-t border-border/60 pt-8 sm:flex-row"
+              className="flex w-full flex-col items-center justify-center gap-4 border-t border-border/60 pt-8 sm:flex-row"
               aria-label="Certification list pages"
             >
               <p className="order-2 font-mono text-xs text-muted-foreground sm:order-1">

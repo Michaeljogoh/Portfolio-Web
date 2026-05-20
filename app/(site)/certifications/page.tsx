@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/zippystarter/container";
-import { certifications } from "@/lib/portfolio-data";
+import { getCertifications } from "@/lib/data/portfolio";
 import { CertificationsFilteredGrid } from "@/components/certifications/certifications-filtered-grid";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Certifications",
@@ -10,12 +12,14 @@ export const metadata: Metadata = {
     "Credentials and assessments — filter by category or search issuers, skills, and topics.",
 };
 
-export default function CertificationsPage() {
+export default async function CertificationsPage() {
+  const certifications = await getCertifications();
+
   return (
     <Container
       component="section"
+      siteWidth="content"
       wrapperClassName="py-24 md:py-28 border-b border-border/50"
-      className="mx-auto max-w-7xl flex-1"
     >
       <header className="relative mb-12 border border-border bg-card/25 p-6 md:mb-16 md:p-10 lg:p-12">
         <div

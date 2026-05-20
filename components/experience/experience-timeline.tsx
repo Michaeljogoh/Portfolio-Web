@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { ExperienceEntry } from "@/lib/portfolio-data";
+import type { ExperienceEntry } from "@/lib/portfolio-types";
 
 function companyInitials(company: string | null): string {
   if (!company?.trim()) return "—";
@@ -34,7 +34,7 @@ function ExperienceLogoSlot({
   logo,
   company,
 }: {
-  logo: string | undefined;
+  logo?: string | null;
   company: string | null;
 }) {
   const label = company ? `${company} logo` : "Company logo";
@@ -84,7 +84,7 @@ export function ExperienceTimeline({ entries }: Props) {
           const { role, company } = parseRoleTitle(entry.title);
           return (
             <li
-              key={`${entry.title}-${entry.date}`}
+              key={entry.id ?? `${entry.title}-${entry.date}`}
               className="relative pl-10 md:pl-14"
             >
               <span

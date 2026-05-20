@@ -22,7 +22,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import type { Project } from "@/lib/portfolio-data";
+import type { Project } from "@/lib/portfolio-types";
 import {
   PROJECT_CATEGORIES,
   type ProjectCategoryId,
@@ -407,7 +407,7 @@ export function ProjectsFilteredGrid({ projects }: Props) {
         <>
           <div ref={resultsAnchorRef} className="scroll-mt-24" aria-hidden />
           {cardView === "row" ? (
-            <div className="mx-auto flex w-full max-w-7xl flex-col gap-5">
+            <div className="flex w-full flex-col gap-5">
               {pagedFiltered.map((project) => (
                 <Card
                   key={project.title}
@@ -440,7 +440,7 @@ export function ProjectsFilteredGrid({ projects }: Props) {
               ))}
             </div>
           ) : (
-            <div className="mx-auto grid w-full max-w-7xl grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-6">
+            <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-6">
               {pagedFiltered.map((project) => (
                 <Card
                   key={project.title}
@@ -474,7 +474,7 @@ export function ProjectsFilteredGrid({ projects }: Props) {
           )}
           {totalPages > 1 ? (
             <nav
-              className="mx-auto flex w-full max-w-7xl flex-col items-center justify-center gap-4 border-t border-border/60 pt-8 sm:flex-row"
+              className="flex w-full flex-col items-center justify-center gap-4 border-t border-border/60 pt-8 sm:flex-row"
               aria-label="Project list pages"
             >
               <p className="order-2 font-mono text-xs text-muted-foreground sm:order-1">

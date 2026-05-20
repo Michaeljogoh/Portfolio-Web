@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/zippystarter/container";
 import { ExperienceTimeline } from "@/components/experience/experience-timeline";
-import { experience } from "@/lib/portfolio-data";
+import { getExperience } from "@/lib/data/portfolio";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Experience",
@@ -10,14 +12,15 @@ export const metadata: Metadata = {
     "Professional experience and roles across full-stack, backend, and DevOps.",
 };
 
-export default function ExperiencePage() {
+export default async function ExperiencePage() {
+  const experience = await getExperience();
   const count = experience.length;
 
   return (
     <Container
       component="section"
+      siteWidth="content"
       wrapperClassName="py-24 md:py-28 border-b border-border/50"
-      className="mx-auto max-w-7xl flex-1"
     >
       <header className="relative mb-12 border border-border bg-card/25 p-6 md:mb-16 md:p-10 lg:p-12">
         <div

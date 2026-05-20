@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/zippystarter/container";
-import { projects } from "@/lib/portfolio-data";
+import { getProjects } from "@/lib/data/portfolio";
 import { ProjectsFilteredGrid } from "@/components/projects/projects-filtered-grid";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -10,12 +12,14 @@ export const metadata: Metadata = {
     "Selected work — filter by category or search APIs, automation, AI, and cloud projects.",
 };
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const projects = await getProjects();
+
   return (
     <Container
       component="section"
+      siteWidth="content"
       wrapperClassName="py-24 md:py-28 border-b border-border/50"
-      className="mx-auto max-w-7xl flex-1"
     >
       <header className="relative mb-12 border border-border bg-card/25 p-6 md:mb-16 md:p-10 lg:p-12">
         <div

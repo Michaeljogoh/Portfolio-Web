@@ -3,7 +3,9 @@ import Link from "next/link";
 import { Code2, Cloud, Bot, ShieldCheck } from "lucide-react";
 import { SkillStackIcon } from "@/components/skills/skill-stack-icon";
 import { Container } from "@/components/zippystarter/container";
-import { skills } from "@/lib/portfolio-data";
+import { getSkillGroups } from "@/lib/data/portfolio";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Skills",
@@ -11,15 +13,16 @@ export const metadata: Metadata = {
     "Languages, frameworks, data stores, cloud, and DevOps tooling used in production.",
 };
 
-export default function SkillsPage() {
+export default async function SkillsPage() {
+  const skills = await getSkillGroups();
   const domainCount = skills.length;
   const toolCount = skills.reduce((n, g) => n + g.items.length, 0);
 
   return (
     <Container
       component="section"
+      siteWidth="content"
       wrapperClassName="py-24 md:py-28 border-b border-border/50"
-      className="mx-auto max-w-7xl flex-1"
     >
       <header className="relative mb-12 border border-border bg-card/25 p-6 md:mb-16 md:p-10 lg:p-12">
         <div
@@ -104,20 +107,23 @@ export default function SkillsPage() {
         </div>
 
         <div className="md:col-span-8 grid sm:grid-cols-3 gap-8">
-          {skills.map((skillGroup, idx) => (
-            <div key={idx} className="space-y-6">
+          {skills.map((skillGroup) => (
+            <div key={skillGroup.id ?? skillGroup.category} className="space-y-6">
               <h2 className="text-xl font-display border-b border-primary/30 pb-2 inline-block">
                 {skillGroup.category}
               </h2>
               <ul className="space-y-3">
-                {skillGroup.items.map((skill, sIdx) => (
+                {skillGroup.items.map((skill) => (
                   <li
-                    key={sIdx}
+                    key={skill.id ?? skill.name}
                     className="flex items-center justify-between group"
                   >
                     <span className="flex min-w-0 items-center gap-2.5 font-mono text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                      <SkillStackIcon skill={skill} />
-                      {skill}
+                      <SkillStackIcon
+                        skill={skill.name}
+                        iconUrl={skill.iconUrl}
+                      />
+                      {skill.name}
                     </span>
                     <div className="h-[2px] w-12 bg-secondary group-hover:bg-primary transition-colors"></div>
                   </li>
