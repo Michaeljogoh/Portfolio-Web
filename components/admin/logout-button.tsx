@@ -10,14 +10,14 @@ export function LogoutButton() {
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
     toastSuccess("Signed out");
-    router.push("/login");
+    router.push("/");
     router.refresh();
   }
 
   return (
     <Button
       type="button"
-      variant="outline"
+      variant="destructive"
       size="sm"
       className="font-mono text-[10px] uppercase"
       onClick={handleLogout}

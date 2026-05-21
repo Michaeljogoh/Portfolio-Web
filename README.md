@@ -46,7 +46,7 @@ pnpm db:seed
 3. Sign in at [http://localhost:3002/login](http://localhost:3002/login) (not linked from the public site).
 4. Manage content at `/admin` — projects, skills (categories + auto icons), experience, and certifications.
 
-Without `DATABASE_URL`, public pages fall back to static data in `lib/portfolio-data.ts`.
+Projects, skills, experience, and certifications are **database-only** (empty until you seed). Home, contact, and footer still use static data in `lib/portfolio-data.ts` / `lib/hero-pillars.ts`. Initial CMS content lives in `lib/seed-data.ts` for `pnpm db:seed` only.
 
 ## Contact form
 

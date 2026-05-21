@@ -5,7 +5,7 @@ import {
   experience,
   projects,
   skills,
-} from "../lib/portfolio-data";
+} from "../lib/seed-data";
 import { getPrisma } from "../lib/prisma";
 import { resolveSkillIconUrl } from "../lib/skill-icon-resolver";
 
