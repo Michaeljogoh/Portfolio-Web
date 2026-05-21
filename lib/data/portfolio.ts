@@ -1,11 +1,5 @@
 import type { ProjectCategoryId } from "@/lib/project-categories";
 import type { CertificationCategoryId } from "@/lib/cert-categories";
-import {
-  certifications as staticCertifications,
-  experience as staticExperience,
-  projects as staticProjects,
-  skills as staticSkillsLegacy,
-} from "@/lib/portfolio-data";
 import { getPrisma, isDatabaseConfigured } from "@/lib/prisma";
 import type {
   Certification,
@@ -79,83 +73,44 @@ function mapCertification(row: {
 }
 
 export async function getProjects(): Promise<Project[]> {
-  if (!isDatabaseConfigured()) {
-    return staticProjects;
-  }
-  try {
-    const rows = await getPrisma().project.findMany({
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    });
-    if (rows.length === 0) return staticProjects;
-    return rows.map(mapProject);
-  } catch {
-    return staticProjects;
-  }
+  if (!isDatabaseConfigured()) return [];
+  const rows = await getPrisma().project.findMany({
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+  });
+  return rows.map(mapProject);
 }
 
 export async function getExperience(): Promise<ExperienceEntry[]> {
-  if (!isDatabaseConfigured()) {
-    return staticExperience;
-  }
-  try {
-    const rows = await getPrisma().experience.findMany({
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    });
-    if (rows.length === 0) return staticExperience;
-    return rows.map(mapExperience);
-  } catch {
-    return staticExperience;
-  }
+  if (!isDatabaseConfigured()) return [];
+  const rows = await getPrisma().experience.findMany({
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+  });
+  return rows.map(mapExperience);
 }
 
 export async function getCertifications(): Promise<Certification[]> {
-  if (!isDatabaseConfigured()) {
-    return staticCertifications;
-  }
-  try {
-    const rows = await getPrisma().certification.findMany({
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    });
-    if (rows.length === 0) return staticCertifications;
-    return rows.map(mapCertification);
-  } catch {
-    return staticCertifications;
-  }
+  if (!isDatabaseConfigured()) return [];
+  const rows = await getPrisma().certification.findMany({
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+  });
+  return rows.map(mapCertification);
 }
 
 export async function getSkillGroups(): Promise<SkillGroup[]> {
-  if (!isDatabaseConfigured()) {
-    return staticSkillsLegacy.map((g) => ({
-      category: g.category,
-      items: g.items.map((name) => ({ name, iconUrl: null })),
-    }));
-  }
-  try {
-    const categories = await getPrisma().skillCategory.findMany({
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-      include: {
-        skills: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
-      },
-    });
-    if (categories.length === 0) {
-      return staticSkillsLegacy.map((g) => ({
-        category: g.category,
-        items: g.items.map((name) => ({ name, iconUrl: null })),
-      }));
-    }
-    return categories.map((c) => ({
-      id: c.id,
-      category: c.name,
-      items: c.skills.map((s) => ({
-        id: s.id,
-        name: s.name,
-        iconUrl: s.iconUrl,
-      })),
-    }));
-  } catch {
-    return staticSkillsLegacy.map((g) => ({
-      category: g.category,
-      items: g.items.map((name) => ({ name, iconUrl: null })),
-    }));
-  }
+  if (!isDatabaseConfigured()) return [];
+  const categories = await getPrisma().skillCategory.findMany({
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    include: {
+      skills: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
+    },
+  });
+  return categories.map((c) => ({
+    id: c.id,
+    category: c.name,
+    items: c.skills.map((s) => ({
+      id: s.id,
+      name: s.name,
+      iconUrl: s.iconUrl,
+    })),
+  }));
 }
