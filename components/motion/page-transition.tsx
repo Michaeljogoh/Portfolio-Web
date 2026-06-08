@@ -2,51 +2,60 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
-
-const enterEase = [0.16, 1, 0.3, 1] as const;
-const exitEase = [0.4, 0, 1, 1] as const;
+import { useEffect, useRef, type ReactNode } from "react";
+import { FrozenRouter } from "./frozen-router";
+import { DURATION, EASE_IN, EASE_OUT, getRouteDirection } from "./presets";
 
 const enterTransition = {
-  delay: 0.14,
-  duration: 0.5,
-  ease: enterEase,
+  duration: DURATION.normal,
+  ease: EASE_OUT,
 } as const;
 
 const exitTransition = {
-  delay: 0,
-  duration: 0.22,
-  ease: exitEase,
+  duration: DURATION.fast,
+  ease: EASE_IN,
 } as const;
 
 export function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const prefersReducedMotion = useReducedMotion();
+  const previousPath = useRef(pathname);
+
+  const direction = getRouteDirection(previousPath.current, pathname);
+
+  useEffect(() => {
+    previousPath.current = pathname;
+  }, [pathname]);
 
   if (prefersReducedMotion) {
     return <div className="contents">{children}</div>;
   }
 
+  const enterX = direction === "forward" ? 16 : direction === "backward" ? -16 : 0;
+  const exitX = direction === "forward" ? -12 : direction === "backward" ? 12 : 0;
+
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence mode="wait">
       <motion.div
         key={pathname}
-        className="w-full origin-top"
-        initial={{ opacity: 0, y: 36, scale: 0.94 }}
+        className="w-full"
+        initial={{ opacity: 0, y: 10, x: enterX, scale: 0.985 }}
         animate={{
           opacity: 1,
           y: 0,
+          x: 0,
           scale: 1,
           transition: enterTransition,
         }}
         exit={{
           opacity: 0,
-          y: -18,
-          scale: 0.97,
+          y: -6,
+          x: exitX,
+          scale: 0.99,
           transition: exitTransition,
         }}
       >
-        {children}
+        <FrozenRouter>{children}</FrozenRouter>
       </motion.div>
     </AnimatePresence>
   );

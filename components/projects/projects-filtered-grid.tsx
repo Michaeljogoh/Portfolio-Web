@@ -1,6 +1,9 @@
 "use client";
 
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useCallback, useEffect, useRef } from "react";
+import { DURATION, EASE_OUT, slideUpOnScroll } from "@/components/motion/presets";
+import { useAnimationReady } from "@/hooks/use-animation-ready";
 import Link from "next/link";
 import {
   Card,
@@ -29,7 +32,7 @@ import {
   getProjectCategoryLabel,
   isFeaturedCategory,
 } from "@/lib/project-categories";
-import { ProjectImage } from "@/components/project-image";
+import { ProjectMedia } from "@/components/project-media";
 import { cn } from "@/lib/utils";
 
 function matchesSearch(project: Project, query: string): boolean {
@@ -140,7 +143,17 @@ function ProjectCardLinks({
   );
 }
 
+const MotionCard = motion.create(Card);
+
+const cardMotion = {
+  hidden: slideUpOnScroll.hidden,
+  visible: slideUpOnScroll.visible,
+  exit: { opacity: 0, y: -8 },
+};
+
 export function ProjectsFilteredGrid({ projects }: Props) {
+  const prefersReducedMotion = useReducedMotion();
+  const ready = useAnimationReady();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<
@@ -408,68 +421,120 @@ export function ProjectsFilteredGrid({ projects }: Props) {
           <div ref={resultsAnchorRef} className="scroll-mt-24" aria-hidden />
           {cardView === "row" ? (
             <div className="flex w-full flex-col gap-5">
-              {pagedFiltered.map((project) => (
-                <Card
-                  key={project.title}
-                  className="group grid min-h-0 w-full grid-cols-1 overflow-hidden rounded-none border-border bg-card p-0 transition-all duration-300 hover:border-primary/50 sm:min-h-[11rem] sm:grid-cols-[minmax(12rem,min(42%,22rem))_minmax(0,1fr)] sm:grid-rows-1 sm:items-stretch"
-                >
-                  <ProjectImage
-                    src={project.image}
-                    alt={project.title}
-                    wrapperClassName="relative aspect-video min-h-0 w-full border-b border-border bg-primary sm:aspect-auto sm:h-full sm:min-h-0 sm:w-full sm:border-b-0 sm:border-r"
-                  />
-                  <div className="flex min-h-0 min-w-0 flex-col gap-3 p-4 sm:gap-3 sm:p-5">
-                    <div className="space-y-2">
-                      <CardTitle className="text-xl font-display leading-tight transition-colors group-hover:text-primary sm:text-2xl">
-                        {project.title}
-                      </CardTitle>
-                      <ProjectCategoryBadges project={project} />
-                      <ProjectTagBadges project={project} />
-                    </div>
-                    <CardDescription className="text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
-                      {project.description}
-                    </CardDescription>
-                    <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3">
-                      <ProjectCardLinks
-                        project={project}
-                        className="text-xs sm:text-sm"
+              <AnimatePresence mode="popLayout">
+                {pagedFiltered.map((project) => {
+                  const cardKey = `${project.title}-${page}`;
+                  const cardClassName =
+                    "group grid min-h-0 w-full grid-cols-1 overflow-hidden rounded-none border-border bg-card p-0 transition-all duration-300 hover:border-primary/50 sm:min-h-64 sm:grid-cols-[minmax(16rem,min(48%,28rem))_minmax(0,1fr)] sm:grid-rows-1 sm:items-stretch";
+                  const content = (
+                    <>
+                      <ProjectMedia
+                        media={project.media}
+                        alt={project.title}
+                        wrapperClassName="relative aspect-video min-h-48 w-full border-b border-border bg-primary sm:aspect-auto sm:h-full sm:min-h-full sm:w-full sm:border-b-0 sm:border-r"
                       />
-                    </div>
-                  </div>
-                </Card>
-              ))}
+                      <div className="flex min-h-0 min-w-0 flex-col gap-3 p-4 sm:gap-3 sm:p-5">
+                        <div className="space-y-2">
+                          <CardTitle className="text-xl font-display leading-tight transition-colors group-hover:text-primary sm:text-2xl">
+                            {project.title}
+                          </CardTitle>
+                          <ProjectCategoryBadges project={project} />
+                          <ProjectTagBadges project={project} />
+                        </div>
+                        <CardDescription className="text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
+                          {project.description}
+                        </CardDescription>
+                        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3">
+                          <ProjectCardLinks
+                            project={project}
+                            className="text-xs sm:text-sm"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  );
+
+                  if (prefersReducedMotion) {
+                    return (
+                      <Card key={cardKey} className={cardClassName}>
+                        {content}
+                      </Card>
+                    );
+                  }
+
+                  return (
+                    <MotionCard
+                      key={cardKey}
+                      layout
+                      variants={cardMotion}
+                      initial="hidden"
+                      whileInView={ready ? "visible" : "hidden"}
+                      viewport={{ once: true, amount: 0.2 }}
+                      exit="exit"
+                      transition={{ duration: DURATION.scroll, ease: EASE_OUT }}
+                      className={cardClassName}
+                    >
+                      {content}
+                    </MotionCard>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           ) : (
             <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-6">
-              {pagedFiltered.map((project) => (
-                <Card
-                  key={project.title}
-                  className="pt-2 group grid grid-rows-subgrid row-span-3 content-start items-start gap-0 overflow-hidden rounded-none border-border bg-card p-0 py-0 shadow-none transition-all duration-300 hover:border-primary/50"
-                >
-                  <ProjectImage
-                    src={project.image}
-                    alt={project.title}
-                    // wrapperClassName="relative aspect-video min-h-0 w-full border-b border-border bg-primary sm:aspect-auto sm:h-full sm:min-h-0 sm:w-full sm:border-b-0 sm:border-r"
-                  />
-                  <div className="grid gap-4">
-                    <CardHeader className="grid gap-4 mt-2">
-                      <CardTitle className="text-2xl font-display transition-colors group-hover:text-primary">
-                        {project.title}
-                      </CardTitle>
-                      <ProjectCategoryBadges project={project} />
-                      <ProjectTagBadges project={project} />
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <CardDescription className="text-base">
-                        {project.description}
-                      </CardDescription>
-                    </CardContent>
-                  </div>
-                  <CardFooter className="flex justify-between py-4">
-                    <ProjectCardLinks project={project} className="text-sm" />
-                  </CardFooter>
-                </Card>
-              ))}
+              <AnimatePresence mode="popLayout">
+                {pagedFiltered.map((project) => {
+                  const cardKey = `${project.title}-${page}`;
+                  const cardClassName =
+                    "pt-2 group grid grid-rows-subgrid row-span-3 content-start items-start gap-0 overflow-hidden rounded-none border-border bg-card p-0 py-0 shadow-none transition-all duration-300 hover:border-primary/50";
+                  const content = (
+                    <>
+                      <ProjectMedia media={project.media} alt={project.title} />
+                      <div className="grid gap-4">
+                        <CardHeader className="grid gap-4 mt-2">
+                          <CardTitle className="text-2xl font-display transition-colors group-hover:text-primary">
+                            {project.title}
+                          </CardTitle>
+                          <ProjectCategoryBadges project={project} />
+                          <ProjectTagBadges project={project} />
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <CardDescription className="text-base">
+                            {project.description}
+                          </CardDescription>
+                        </CardContent>
+                      </div>
+                      <CardFooter className="flex justify-between py-4">
+                        <ProjectCardLinks project={project} className="text-sm" />
+                      </CardFooter>
+                    </>
+                  );
+
+                  if (prefersReducedMotion) {
+                    return (
+                      <Card key={cardKey} className={cardClassName}>
+                        {content}
+                      </Card>
+                    );
+                  }
+
+                  return (
+                    <MotionCard
+                      key={cardKey}
+                      layout
+                      variants={cardMotion}
+                      initial="hidden"
+                      whileInView={ready ? "visible" : "hidden"}
+                      viewport={{ once: true, amount: 0.2 }}
+                      exit="exit"
+                      transition={{ duration: DURATION.scroll, ease: EASE_OUT }}
+                      className={cardClassName}
+                    >
+                      {content}
+                    </MotionCard>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           )}
           {totalPages > 1 ? (

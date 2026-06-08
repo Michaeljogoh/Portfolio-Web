@@ -21,7 +21,7 @@ model Project {
   description String   @db.Text
   tags        String[]
   categories  String[]
-  image       String
+  media       Json     @default("{\"type\":\"image\",\"url\":\"/project-placeholder-1.jpg\",\"provider\":\"local\"}")
   link        String
   repo        String
   sortOrder   Int      @default(0)

@@ -1,5 +1,6 @@
 import type { ProjectCategoryId } from "@/lib/project-categories";
 import type { CertificationCategoryId } from "@/lib/cert-categories";
+import type { ProjectMedia } from "@/lib/project-media";
 
 export type Project = {
   id?: string;
@@ -7,7 +8,7 @@ export type Project = {
   description: string;
   tags: string[];
   categories: ProjectCategoryId[];
-  image: string;
+  media: ProjectMedia;
   link: string;
   repo: string;
 };

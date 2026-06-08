@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/zippystarter/container";
 import { SiteHeaderNav } from "@/components/site-header-nav";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function SiteHeader() {
   return (
@@ -20,6 +21,7 @@ export function SiteHeader() {
 
       <div className="flex flex-1 items-center justify-end gap-2 md:min-w-0">
         <SiteHeaderNav />
+        <ThemeToggle />
         <Button
           variant="default"
           className="hidden md:inline-flex font-mono text-xs border-primary/50 shrink-0"

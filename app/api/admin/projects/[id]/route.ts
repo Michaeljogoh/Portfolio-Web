@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { destroyProjectMedia } from "@/lib/cloudinary";
 import { getPrisma } from "@/lib/prisma";
+import { parseProjectMedia } from "@/lib/project-media";
 import { projectSchema } from "@/lib/validations/admin";
 
 type Params = { params: Promise<{ id: string }> };
@@ -23,11 +25,27 @@ export async function PATCH(request: Request, { params }: Params) {
       { status: 400 },
     );
   }
+
   try {
-    const project = await getPrisma().project.update({
+    const prisma = getPrisma();
+    const existing = await prisma.project.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    const project = await prisma.project.update({
       where: { id },
       data: parsed.data,
     });
+
+    if (parsed.data.media) {
+      const previous = parseProjectMedia(existing.media);
+      const next = parseProjectMedia(parsed.data.media);
+      if (previous.publicId && previous.publicId !== next.publicId) {
+        await destroyProjectMedia(previous).catch(() => undefined);
+      }
+    }
+
     return NextResponse.json(project);
   } catch {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -37,7 +55,17 @@ export async function PATCH(request: Request, { params }: Params) {
 export async function DELETE(_request: Request, { params }: Params) {
   const { id } = await params;
   try {
-    await getPrisma().project.delete({ where: { id } });
+    const prisma = getPrisma();
+    const existing = await prisma.project.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    await prisma.project.delete({ where: { id } });
+    await destroyProjectMedia(parseProjectMedia(existing.media)).catch(
+      () => undefined,
+    );
+
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

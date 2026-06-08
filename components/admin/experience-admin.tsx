@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FormField } from "@/components/admin/form-field";
+import { LogoUploader } from "@/components/admin/logo-uploader";
 import {
   confirmDelete,
   parseApiError,
@@ -133,10 +134,10 @@ export function ExperienceAdmin() {
               />
             </FormField>
           </div>
-          <FormField label="Logo URL (optional)">
-            <Input
+          <FormField label="Company logo (optional)">
+            <LogoUploader
               value={form.logo}
-              onChange={(e) => setForm({ ...form, logo: e.target.value })}
+              onChange={(url) => setForm({ ...form, logo: url })}
             />
           </FormField>
           <FormField label="Excerpt">

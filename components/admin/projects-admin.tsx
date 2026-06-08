@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CategoryCheckboxes } from "@/components/admin/category-checkboxes";
 import { FormField } from "@/components/admin/form-field";
+import { ProjectMediaUploader } from "@/components/admin/project-media-uploader";
 import { PROJECT_CATEGORIES } from "@/lib/project-categories";
 import {
   confirmDelete,
@@ -13,6 +14,11 @@ import {
   toastError,
   toastSuccess,
 } from "@/lib/admin-toast";
+import {
+  PROJECT_MEDIA_PLACEHOLDER,
+  parseProjectMedia,
+  type ProjectMedia,
+} from "@/lib/project-media";
 import { parseTagsInput } from "@/lib/validations/admin";
 import type { ProjectCategoryId } from "@/lib/project-categories";
 
@@ -22,7 +28,7 @@ type ProjectRow = {
   description: string;
   tags: string[];
   categories: string[];
-  image: string;
+  media: ProjectMedia;
   link: string;
   repo: string;
 };
@@ -32,7 +38,7 @@ const emptyForm = {
   description: "",
   tags: "",
   categories: [] as ProjectCategoryId[],
-  image: "/project-placeholder-1.jpg",
+  media: { ...PROJECT_MEDIA_PLACEHOLDER } as ProjectMedia,
   link: "#",
   repo: "https://github.com/Michaeljogoh",
 };
@@ -47,7 +53,17 @@ export function ProjectsAdmin() {
   const load = useCallback(async () => {
     setLoading(true);
     const res = await fetch("/api/admin/projects");
-    if (res.ok) setItems(await res.json());
+    if (res.ok) {
+      const rows = (await res.json()) as Array<
+        Omit<ProjectRow, "media"> & { media: unknown }
+      >;
+      setItems(
+        rows.map((row) => ({
+          ...row,
+          media: parseProjectMedia(row.media),
+        })),
+      );
+    }
     setLoading(false);
   }, []);
 
@@ -67,7 +83,7 @@ export function ProjectsAdmin() {
       description: item.description,
       tags: item.tags.join(", "),
       categories: item.categories as ProjectCategoryId[],
-      image: item.image,
+      media: item.media,
       link: item.link,
       repo: item.repo,
     });
@@ -86,7 +102,7 @@ export function ProjectsAdmin() {
       description: form.description,
       tags: parseTagsInput(form.tags),
       categories: form.categories,
-      image: form.image,
+      media: form.media,
       link: form.link,
       repo: form.repo,
     };
@@ -166,14 +182,13 @@ export function ProjectsAdmin() {
               }
             />
           </FormField>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <FormField label="Image URL">
-              <Input
-                value={form.image}
-                onChange={(e) => setForm({ ...form, image: e.target.value })}
-                required
-              />
-            </FormField>
+          <FormField label="Project media">
+            <ProjectMediaUploader
+              value={form.media}
+              onChange={(media) => setForm({ ...form, media })}
+            />
+          </FormField>
+          <div className="grid gap-4 sm:grid-cols-2">
             <FormField label="Live link">
               <Input
                 value={form.link}
@@ -214,7 +229,7 @@ export function ProjectsAdmin() {
             <div className="min-w-0">
               <p className="font-display text-lg">{item.title}</p>
               <p className="truncate font-mono text-xs text-muted-foreground">
-                {item.tags.join(" · ")}
+                {item.tags.join(" · ")} · {item.media.type}
               </p>
             </div>
             <div className="flex shrink-0 gap-2">

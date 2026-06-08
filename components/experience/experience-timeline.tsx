@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { ScrollRevealItem } from "@/components/motion/scroll-reveal-item";
 import type { ExperienceEntry } from "@/lib/portfolio-types";
 
 function companyInitials(company: string | null): string {
@@ -43,23 +46,14 @@ function ExperienceLogoSlot({
   return (
     <div className="relative flex size-14 rounded-md shrink-0 items-center justify-center overflow-hidden border border-border bg-muted/30 md:size-16">
       {logo ? (
-        logo.startsWith("/") ? (
-          <Image
-            src={logo}
-            alt={label}
-            fill
-            className="object-contain p-2"
-            sizes="(min-width: 768px) 64px, 56px"
-          />
-        ) : (
-          <Image
-            src={logo}
-            alt={label}
-            fill
-            className="object-contain p-2"
-            sizes="(min-width: 768px) 64px, 56px"
-          />
-        )
+        <Image
+          src={logo}
+          alt={label}
+          fill
+          unoptimized={logo.startsWith("/")}
+          className="object-cover"
+          sizes="(min-width: 768px) 64px, 56px"
+        />
       ) : (
         <span
           aria-hidden
@@ -83,7 +77,8 @@ export function ExperienceTimeline({ entries }: Props) {
         {entries.map((entry, index) => {
           const { role, company } = parseRoleTitle(entry.title);
           return (
-            <li
+            <ScrollRevealItem
+              as="li"
               key={entry.id ?? `${entry.title}-${entry.date}`}
               className="relative pl-10 md:pl-14"
             >
@@ -123,7 +118,7 @@ export function ExperienceTimeline({ entries }: Props) {
                   {String(entries.length).padStart(2, "0")}
                 </p>
               </article>
-            </li>
+            </ScrollRevealItem>
           );
         })}
       </ol>

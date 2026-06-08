@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Menu } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const nav = [
   { href: "/", label: "Home" },
@@ -43,8 +45,10 @@ function NavLink({
   label,
   className,
   onNavigate,
-}: NavLinkProps) {
+  showIndicator = false,
+}: NavLinkProps & { showIndicator?: boolean }) {
   const active = isNavActive(pathname, href);
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <Link
@@ -52,14 +56,23 @@ function NavLink({
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "transition-colors",
+        "relative transition-colors",
         active
-          ? "text-primary underline decoration-primary decoration-2 underline-offset-4"
+          ? "text-primary"
           : "text-muted-foreground hover:text-primary",
         className,
       )}
     >
       {label}
+      {active && showIndicator && !prefersReducedMotion ? (
+        <motion.span
+          layoutId="nav-active-indicator"
+          className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"
+          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+        />
+      ) : active ? (
+        <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary" />
+      ) : null}
     </Link>
   );
 }
@@ -83,6 +96,7 @@ export function SiteHeaderNav() {
             href={href}
             label={label}
             className="shrink-0"
+            showIndicator
           />
         ))}
       </nav>
@@ -116,6 +130,12 @@ export function SiteHeaderNav() {
               />
             ))}
           </nav>
+          <div className="flex items-center justify-between border-t border-border pt-6">
+            <span className="font-mono text-xs text-muted-foreground">
+              Theme
+            </span>
+            <ThemeToggle />
+          </div>
           <Button
             variant="default"
             className="mt-auto w-full font-mono text-xs border-primary/50"
