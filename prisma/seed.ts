@@ -30,7 +30,7 @@ async function main() {
         description: p.description,
         tags: [...p.tags],
         categories: [...p.categories],
-        image: p.image,
+        media: p.media,
         link: p.link,
         repo: p.repo,
         sortOrder: i,

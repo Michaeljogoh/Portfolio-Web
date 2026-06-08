@@ -51,7 +51,7 @@ export default function RootLayout({
       <body
         className={`font-body antialiased ${spaceGrotesk.variable} ${jetBrainsMono.variable}`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider>
           {children}
           <Toaster />
         </ThemeProvider>

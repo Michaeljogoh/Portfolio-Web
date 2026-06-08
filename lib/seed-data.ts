@@ -6,6 +6,7 @@ import type {
   ExperienceEntry,
   Project,
 } from "@/lib/portfolio-types";
+import { projectMediaFromUrl } from "@/lib/project-media";
 import { SOCIAL } from "@/lib/portfolio-data";
 
 export const projects: Project[] = [
@@ -21,7 +22,7 @@ export const projects: Project[] = [
       "frontend-ui",
       "devops-cloud",
     ],
-    image: "/project-placeholder-1.jpg",
+    media: projectMediaFromUrl("/project-placeholder-1.jpg"),
     link: "#",
     repo: SOCIAL.github,
   },
@@ -31,7 +32,7 @@ export const projects: Project[] = [
       "RESTful API with NestJS and TypeScript, integrated with an external user service (ReqRes). MongoDB storage, avatar handling, email notifications, RabbitMQ events, and full Jest unit test coverage.",
     tags: ["NestJS", "TypeScript", "MongoDB", "RabbitMQ", "Jest"],
     categories: ["backend-apis"],
-    image: "/project-placeholder-2.jpg",
+    media: projectMediaFromUrl("/project-placeholder-2.jpg"),
     link: "#",
     repo: SOCIAL.github,
   },
@@ -41,7 +42,7 @@ export const projects: Project[] = [
       "Additional work spans Express and Nest backends, HIPAA/GDPR-aware systems, CI/CD with Jenkins and GitLab, and infrastructure automation with Terraform and Ansible.",
     tags: ["Node.js", "DevOps", "Security", "APIs"],
     categories: ["backend-apis", "devops-cloud", "cybersecurity"],
-    image: "/project-placeholder-3.jpg",
+    media: projectMediaFromUrl("/project-placeholder-3.jpg"),
     link: SOCIAL.github,
     repo: SOCIAL.github,
   },

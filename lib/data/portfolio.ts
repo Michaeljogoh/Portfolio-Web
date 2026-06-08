@@ -7,6 +7,7 @@ import type {
   Project,
   SkillGroup,
 } from "@/lib/portfolio-types";
+import { parseProjectMedia } from "@/lib/project-media";
 
 function mapProject(row: {
   id: string;
@@ -14,7 +15,7 @@ function mapProject(row: {
   description: string;
   tags: string[];
   categories: string[];
-  image: string;
+  media: unknown;
   link: string;
   repo: string;
 }): Project {
@@ -24,7 +25,7 @@ function mapProject(row: {
     description: row.description,
     tags: row.tags,
     categories: row.categories as ProjectCategoryId[],
-    image: row.image,
+    media: parseProjectMedia(row.media),
     link: row.link,
     repo: row.repo,
   };

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { PROJECT_CATEGORIES } from "@/lib/project-categories";
 import { CERTIFICATION_CATEGORIES } from "@/lib/cert-categories";
+import { projectMediaSchema } from "@/lib/project-media";
 
 const projectCategoryIds = PROJECT_CATEGORIES.map((c) => c.id) as [
   string,
@@ -22,7 +23,7 @@ export const projectSchema = z.object({
   description: z.string().min(1),
   tags: z.array(z.string().min(1)).default([]),
   categories: z.array(z.enum(projectCategoryIds)).min(1),
-  image: z.string().min(1),
+  media: projectMediaSchema,
   link: z.string().min(1),
   repo: z.string().min(1),
   sortOrder: z.number().int().optional(),
