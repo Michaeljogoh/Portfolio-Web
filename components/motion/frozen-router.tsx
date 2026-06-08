@@ -5,7 +5,7 @@ import { useSelectedLayoutSegment } from "next/navigation";
 import { useContext, useEffect, useRef, type ReactNode } from "react";
 
 function usePreviousValue<T>(value: T): T | undefined {
-  const previous = useRef<T>();
+  const previous = useRef<T | undefined>(undefined);
 
   useEffect(() => {
     previous.current = value;
