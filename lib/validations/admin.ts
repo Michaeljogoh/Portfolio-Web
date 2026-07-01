@@ -62,6 +62,12 @@ export const skillSchema = z.object({
   sortOrder: z.number().int().optional(),
 });
 
+export const resumeFormatSchema = z.enum(["pdf", "docx"]);
+
+export const reorderSchema = z.object({
+  orderedIds: z.array(z.string().min(1)).min(1),
+});
+
 export function parseTagsInput(value: string): string[] {
   return value
     .split(",")

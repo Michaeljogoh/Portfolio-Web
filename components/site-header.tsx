@@ -1,10 +1,15 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Container } from "@/components/zippystarter/container";
 import { SiteHeaderNav } from "@/components/site-header-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ResumeCvButton } from "@/components/resume-cv-button";
+import type { ResumeDownload } from "@/lib/resume";
 
-export function SiteHeader() {
+type SiteHeaderProps = {
+  resumeDownloads: ResumeDownload[];
+};
+
+export function SiteHeader({ resumeDownloads }: SiteHeaderProps) {
   return (
     <Container
       component="header"
@@ -20,15 +25,12 @@ export function SiteHeader() {
       </Link>
 
       <div className="flex flex-1 items-center justify-end gap-2 md:min-w-0">
-        <SiteHeaderNav />
+        <SiteHeaderNav resumeDownloads={resumeDownloads} />
         <ThemeToggle />
-        <Button
-          variant="default"
-          className="hidden md:inline-flex font-mono text-xs border-primary/50 shrink-0"
-          asChild
-        >
-          <Link href="/contact">Resume / CV</Link>
-        </Button>
+        <ResumeCvButton
+          downloads={resumeDownloads}
+          className="hidden md:inline-flex"
+        />
       </div>
     </Container>
   );

@@ -33,6 +33,7 @@ import {
   isFeaturedCategory,
 } from "@/lib/project-categories";
 import { ProjectMedia } from "@/components/project-media";
+import { PAGE_SIZE } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 
 function matchesSearch(project: Project, query: string): boolean {
@@ -58,9 +59,6 @@ function matchesCategories(
 }
 
 const SEARCH_DEBOUNCE_MS = 300;
-
-/** Matching projects shown per page (increase if you want fewer pages). */
-const PAGE_SIZE = 6;
 
 const CARD_VIEW_STORAGE_KEY = "portfolio-projects-card-view";
 

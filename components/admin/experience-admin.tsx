@@ -6,12 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FormField } from "@/components/admin/form-field";
 import { LogoUploader } from "@/components/admin/logo-uploader";
+import { SortableAdminList } from "@/components/admin/sortable-admin-list";
 import {
   confirmDelete,
   parseApiError,
   toastError,
   toastSuccess,
 } from "@/lib/admin-toast";
+import { useAdminReorder } from "@/hooks/use-admin-reorder";
 
 type Row = {
   id: string;
@@ -36,6 +38,12 @@ export function ExperienceAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(empty);
   const [saving, setSaving] = useState(false);
+  const { handleReorder, reordering } = useAdminReorder(
+    items,
+    setItems,
+    "/api/admin/experience/reorder",
+  );
+  const dragDisabled = editingId !== null || reordering;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -92,7 +100,9 @@ export function ExperienceAdmin() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="font-mono text-xs text-muted-foreground">
-          {loading ? "Loading…" : `${items.length} entries`}
+          {loading
+            ? "Loading…"
+            : `${items.length} entries${items.length > 1 ? " · drag to reorder" : ""}`}
         </p>
         <Button
           type="button"
@@ -164,12 +174,12 @@ export function ExperienceAdmin() {
         </form>
       ) : null}
 
-      <ul className="space-y-3">
-        {items.map((item) => (
-          <li
-            key={item.id}
-            className="flex flex-col gap-3 border border-border p-4 sm:flex-row sm:justify-between"
-          >
+      <SortableAdminList
+        items={items}
+        onReorder={handleReorder}
+        disabled={dragDisabled}
+        renderItem={(item) => (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-display">{item.title}</p>
               <p className="font-mono text-xs text-muted-foreground">{item.date}</p>
@@ -201,9 +211,9 @@ export function ExperienceAdmin() {
                 Delete
               </Button>
             </div>
-          </li>
-        ))}
-      </ul>
+          </div>
+        )}
+      />
     </div>
   );
 }
