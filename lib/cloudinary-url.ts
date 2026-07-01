@@ -6,6 +6,12 @@ export function isCloudinaryUrl(url: string): boolean {
   return url.includes(CLOUDINARY_HOST);
 }
 
+/** next/image is used for local paths and Cloudinary; other remotes use a native img. */
+export function shouldUseNextImage(src: string): boolean {
+  if (src.startsWith("/")) return true;
+  return isCloudinaryUrl(src);
+}
+
 /** Build a responsive Cloudinary image URL that fills the project card container. */
 export function buildProjectImageSrc(
   media: ProjectImageMedia,

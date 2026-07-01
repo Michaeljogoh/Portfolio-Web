@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { ImagePlus, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { shouldUseNextImage } from "@/lib/cloudinary-url";
 import { cn } from "@/lib/utils";
 import { parseApiError, toastError } from "@/lib/admin-toast";
 
@@ -13,9 +14,19 @@ type LogoUploaderProps = {
   value: string;
   onChange: (url: string) => void;
   className?: string;
+  uploadEndpoint?: string;
+  previewAlt?: string;
+  emptyLabel?: string;
 };
 
-export function LogoUploader({ value, onChange, className }: LogoUploaderProps) {
+export function LogoUploader({
+  value,
+  onChange,
+  className,
+  uploadEndpoint = "/api/admin/experience/logo/upload",
+  previewAlt = "Company logo preview",
+  emptyLabel = "Logo",
+}: LogoUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -27,7 +38,7 @@ export function LogoUploader({ value, onChange, className }: LogoUploaderProps) 
     formData.append("file", file);
 
     try {
-      const res = await fetch("/api/admin/experience/logo/upload", {
+      const res = await fetch(uploadEndpoint, {
         method: "POST",
         body: formData,
       });
@@ -54,17 +65,25 @@ export function LogoUploader({ value, onChange, className }: LogoUploaderProps) 
     <div className={cn("flex items-center gap-4", className)}>
       <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
         {value ? (
-          <Image
-            src={value}
-            alt="Company logo preview"
-            fill
-            unoptimized={value.startsWith("/")}
-            sizes="64px"
-            className="object-cover"
-          />
+          shouldUseNextImage(value) ? (
+            <Image
+              src={value}
+              alt={previewAlt}
+              fill
+              unoptimized={value.startsWith("/")}
+              sizes="64px"
+              className="object-cover"
+            />
+          ) : (
+            <img
+              src={value}
+              alt={previewAlt}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )
         ) : (
           <span className="select-none font-mono text-[10px] uppercase text-muted-foreground">
-            Logo
+            {emptyLabel}
           </span>
         )}
         {uploading ? (
@@ -91,7 +110,11 @@ export function LogoUploader({ value, onChange, className }: LogoUploaderProps) 
           onClick={() => inputRef.current?.click()}
         >
           <ImagePlus className="size-3.5" />
-          {uploading ? "Uploading…" : value ? "Replace logo" : "Upload logo"}
+          {uploading
+            ? "Uploading…"
+            : value
+              ? `Replace ${emptyLabel.toLowerCase()}`
+              : `Upload ${emptyLabel.toLowerCase()}`}
         </Button>
         {value ? (
           <Button

@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CategoryCheckboxes } from "@/components/admin/category-checkboxes";
 import { FormField } from "@/components/admin/form-field";
 import { ProjectMediaUploader } from "@/components/admin/project-media-uploader";
+import { SortableAdminList } from "@/components/admin/sortable-admin-list";
 import { PROJECT_CATEGORIES } from "@/lib/project-categories";
 import {
   confirmDelete,
@@ -21,6 +22,7 @@ import {
 } from "@/lib/project-media";
 import { parseTagsInput } from "@/lib/validations/admin";
 import type { ProjectCategoryId } from "@/lib/project-categories";
+import { useAdminReorder } from "@/hooks/use-admin-reorder";
 
 type ProjectRow = {
   id: string;
@@ -49,6 +51,12 @@ export function ProjectsAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const { handleReorder, reordering } = useAdminReorder(
+    items,
+    setItems,
+    "/api/admin/projects/reorder",
+  );
+  const dragDisabled = editingId !== null || reordering;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -137,7 +145,9 @@ export function ProjectsAdmin() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="font-mono text-xs text-muted-foreground">
-          {loading ? "Loading…" : `${items.length} projects`}
+          {loading
+            ? "Loading…"
+            : `${items.length} projects${items.length > 1 ? " · drag to reorder" : ""}`}
         </p>
         <Button type="button" onClick={startCreate} className="font-mono text-xs uppercase">
           Add project
@@ -220,12 +230,12 @@ export function ProjectsAdmin() {
         </form>
       ) : null}
 
-      <ul className="space-y-3">
-        {items.map((item) => (
-          <li
-            key={item.id}
-            className="flex flex-col gap-3 border border-border p-4 sm:flex-row sm:items-center sm:justify-between"
-          >
+      <SortableAdminList
+        items={items}
+        onReorder={handleReorder}
+        disabled={dragDisabled}
+        renderItem={(item) => (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="font-display text-lg">{item.title}</p>
               <p className="truncate font-mono text-xs text-muted-foreground">
@@ -252,9 +262,9 @@ export function ProjectsAdmin() {
                 Delete
               </Button>
             </div>
-          </li>
-        ))}
-      </ul>
+          </div>
+        )}
+      />
     </div>
   );
 }

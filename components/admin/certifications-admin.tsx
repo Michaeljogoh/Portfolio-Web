@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CategoryCheckboxes } from "@/components/admin/category-checkboxes";
 import { FormField } from "@/components/admin/form-field";
+import { LogoUploader } from "@/components/admin/logo-uploader";
+import { SortableAdminList } from "@/components/admin/sortable-admin-list";
 import { CERTIFICATION_CATEGORIES } from "@/lib/cert-categories";
 import {
   confirmDelete,
@@ -15,6 +17,7 @@ import {
 } from "@/lib/admin-toast";
 import { parseTagsInput } from "@/lib/validations/admin";
 import type { CertificationCategoryId } from "@/lib/cert-categories";
+import { useAdminReorder } from "@/hooks/use-admin-reorder";
 
 type Row = {
   id: string;
@@ -35,7 +38,7 @@ const empty = {
   excerpt: "",
   tags: "",
   categories: [] as CertificationCategoryId[],
-  image: "/project-placeholder-1.jpg",
+  image: "",
   credentialUrl: "#",
 };
 
@@ -45,6 +48,12 @@ export function CertificationsAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(empty);
   const [saving, setSaving] = useState(false);
+  const { handleReorder, reordering } = useAdminReorder(
+    items,
+    setItems,
+    "/api/admin/certifications/reorder",
+  );
+  const dragDisabled = editingId !== null || reordering;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -59,6 +68,10 @@ export function CertificationsAdmin() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!form.image.trim()) {
+      toastError("Upload a certification image before saving.");
+      return;
+    }
     setSaving(true);
     const payload = {
       title: form.title,
@@ -106,7 +119,9 @@ export function CertificationsAdmin() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="font-mono text-xs text-muted-foreground">
-          {loading ? "Loading…" : `${items.length} certifications`}
+          {loading
+            ? "Loading…"
+            : `${items.length} certifications${items.length > 1 ? " · drag to reorder" : ""}`}
         </p>
         <Button
           type="button"
@@ -174,24 +189,24 @@ export function CertificationsAdmin() {
               }
             />
           </FormField>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="Image URL">
-              <Input
-                value={form.image}
-                onChange={(e) => setForm({ ...form, image: e.target.value })}
-                required
-              />
-            </FormField>
-            <FormField label="Credential URL">
-              <Input
-                value={form.credentialUrl}
-                onChange={(e) =>
-                  setForm({ ...form, credentialUrl: e.target.value })
-                }
-                required
-              />
-            </FormField>
-          </div>
+          <FormField label="Certification image">
+            <LogoUploader
+              value={form.image}
+              onChange={(url) => setForm({ ...form, image: url })}
+              uploadEndpoint="/api/admin/certifications/image/upload"
+              previewAlt="Certification badge preview"
+              emptyLabel="Image"
+            />
+          </FormField>
+          <FormField label="Credential URL">
+            <Input
+              value={form.credentialUrl}
+              onChange={(e) =>
+                setForm({ ...form, credentialUrl: e.target.value })
+              }
+              required
+            />
+          </FormField>
           <div className="flex gap-2">
             <Button type="submit" disabled={saving} className="font-mono text-xs uppercase">
               Save
@@ -207,12 +222,12 @@ export function CertificationsAdmin() {
         </form>
       ) : null}
 
-      <ul className="space-y-3">
-        {items.map((item) => (
-          <li
-            key={item.id}
-            className="flex flex-col gap-3 border border-border p-4 sm:flex-row sm:justify-between"
-          >
+      <SortableAdminList
+        items={items}
+        onReorder={handleReorder}
+        disabled={dragDisabled}
+        renderItem={(item) => (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-display">{item.title}</p>
               <p className="font-mono text-xs text-muted-foreground">
@@ -249,9 +264,9 @@ export function CertificationsAdmin() {
                 Delete
               </Button>
             </div>
-          </li>
-        ))}
-      </ul>
+          </div>
+        )}
+      />
     </div>
   );
 }

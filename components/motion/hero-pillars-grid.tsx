@@ -11,14 +11,14 @@ export function HeroPillarsGrid() {
     >
       {HERO_PILLARS.map(({ title, body, Icon }) => (
         <StaggerItem key={title}>
-          <div className="group bg-background/95 backdrop-blur-sm p-5 md:p-6 flex flex-col gap-3 min-h-[140px] md:min-h-[160px] hover:bg-card/80 transition-colors h-full">
+          <div className="group bg-background/95 backdrop-blur-sm p-5 md:p-6 flex flex-col gap-3 min-h-[140px] md:min-h-[160px] h-full transition-colors hover:bg-primary hover:text-primary-foreground">
             <div className="flex items-center justify-between gap-3">
               <span className="font-display text-lg md:text-xl tracking-tight">
                 {title}
               </span>
-              <Icon className="size-5 md:size-6 text-primary/80 shrink-0 group-hover:text-primary transition-colors" />
+              <Icon className="size-5 md:size-6 text-primary shrink-0 transition-colors group-hover:text-primary-foreground" />
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed transition-colors group-hover:text-primary-foreground/85">
               {body}
             </p>
           </div>

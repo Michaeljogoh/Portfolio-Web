@@ -10,6 +10,11 @@ const sections = [
     label: "Certifications",
     desc: "Manage credentials and badges",
   },
+  {
+    href: "/admin/resume",
+    label: "Resume / CV",
+    desc: "Upload PDF and DOCX files for the navbar download button",
+  },
 ] as const;
 
 export default function AdminDashboardPage() {

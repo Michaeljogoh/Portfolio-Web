@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { ScrollRevealItem } from "@/components/motion/scroll-reveal-item";
+import { shouldUseNextImage } from "@/lib/cloudinary-url";
 import type { ExperienceEntry } from "@/lib/portfolio-types";
 
 function companyInitials(company: string | null): string {
@@ -46,14 +47,22 @@ function ExperienceLogoSlot({
   return (
     <div className="relative flex size-14 rounded-md shrink-0 items-center justify-center overflow-hidden border border-border bg-muted/30 md:size-16">
       {logo ? (
-        <Image
-          src={logo}
-          alt={label}
-          fill
-          unoptimized={logo.startsWith("/")}
-          className="object-cover"
-          sizes="(min-width: 768px) 64px, 56px"
-        />
+        shouldUseNextImage(logo) ? (
+          <Image
+            src={logo}
+            alt={label}
+            fill
+            unoptimized={logo.startsWith("/")}
+            className="object-cover"
+            sizes="(min-width: 768px) 64px, 56px"
+          />
+        ) : (
+          <img
+            src={logo}
+            alt={label}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )
       ) : (
         <span
           aria-hidden

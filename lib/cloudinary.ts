@@ -1,9 +1,11 @@
 import { v2 as cloudinary, type UploadApiOptions } from "cloudinary";
 import type { ProjectMedia } from "@/lib/project-media";
+import type { ResumeFormat } from "@/lib/resume";
 
 const IMAGE_MAX_BYTES = 10 * 1024 * 1024;
 const VIDEO_MAX_BYTES = 100 * 1024 * 1024;
 const LOGO_MAX_BYTES = 5 * 1024 * 1024;
+const RESUME_MAX_BYTES = 10 * 1024 * 1024;
 
 const IMAGE_MIME = new Set([
   "image/jpeg",
@@ -21,6 +23,11 @@ const LOGO_MIME = new Set([
   "image/svg+xml",
 ]);
 
+const RESUME_MIME_BY_FORMAT = {
+  pdf: "application/pdf",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+} as const;
+
 const EXT_TO_MIME: Record<string, string> = {
   jpg: "image/jpeg",
   jpeg: "image/jpeg",
@@ -31,6 +38,8 @@ const EXT_TO_MIME: Record<string, string> = {
   mp4: "video/mp4",
   webm: "video/webm",
   mov: "video/quicktime",
+  pdf: "application/pdf",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 };
 
 function resolveFileMime(file: File): string {
@@ -50,6 +59,12 @@ function getUploadFolder(): string {
 function getLogoFolder(): string {
   return normalizeFolder(
     process.env.CLOUDINARY_LOGO_FOLDER ?? "portfolio/logos",
+  );
+}
+
+function getResumeFolder(): string {
+  return normalizeFolder(
+    process.env.CLOUDINARY_RESUME_FOLDER ?? "portfolio/resume",
   );
 }
 
@@ -129,6 +144,26 @@ export function validateLogoFile(
   }
   if (file.size > LOGO_MAX_BYTES) {
     return { ok: false, error: "Logo must be 5 MB or smaller." };
+  }
+  return { ok: true };
+}
+
+export function validateResumeFile(
+  file: File,
+  format: ResumeFormat,
+): { ok: true } | { ok: false; error: string } {
+  const mime = resolveFileMime(file);
+  const expectedMime = RESUME_MIME_BY_FORMAT[format];
+  const ext = file.name.split(".").pop()?.toLowerCase();
+
+  if (mime !== expectedMime && ext !== format) {
+    return {
+      ok: false,
+      error: `Unsupported file type. Upload a .${format} file.`,
+    };
+  }
+  if (file.size > RESUME_MAX_BYTES) {
+    return { ok: false, error: "Resume file must be 10 MB or smaller." };
   }
   return { ok: true };
 }
@@ -249,4 +284,41 @@ export async function uploadLogoFile(file: File): Promise<UploadedLogo> {
   });
 
   return { url: result.secure_url, publicId: result.public_id };
+}
+
+export type UploadedResume = {
+  url: string;
+  publicId: string;
+  fileName: string;
+  byteSize: number;
+};
+
+export async function uploadResumeFile(
+  file: File,
+  format: ResumeFormat,
+): Promise<UploadedResume> {
+  const validation = validateResumeFile(file, format);
+  if (!validation.ok) {
+    throw new Error(validation.error);
+  }
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const result = await uploadBufferToFolder(buffer, getResumeFolder(), {
+    resource_type: "raw",
+    format,
+    public_id: `resume-${format}`,
+  });
+
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
+    fileName: file.name,
+    byteSize: file.size,
+  };
+}
+
+export async function destroyRawFile(publicId: string): Promise<void> {
+  if (!isCloudinaryConfigured()) return;
+  const cld = getCloudinary();
+  await cld.uploader.destroy(publicId, { resource_type: "raw" });
 }

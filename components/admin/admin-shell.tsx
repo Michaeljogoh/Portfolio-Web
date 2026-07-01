@@ -7,6 +7,7 @@ const links = [
   { href: "/admin/skills", label: "Skills" },
   { href: "/admin/experience", label: "Experience" },
   { href: "/admin/certifications", label: "Certifications" },
+  { href: "/admin/resume", label: "Resume" },
 ] as const;
 
 export function AdminShell({

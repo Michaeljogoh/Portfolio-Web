@@ -28,6 +28,7 @@ import {
   getCertificationCategoryLabel,
 } from "@/lib/cert-categories";
 import { ProjectImage } from "@/components/project-image";
+import { PAGE_SIZE } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 
 function matchesSearch(cert: Certification, query: string): boolean {
@@ -55,7 +56,6 @@ function matchesCategories(
 }
 
 const SEARCH_DEBOUNCE_MS = 300;
-const PAGE_SIZE = 6;
 const CARD_VIEW_STORAGE_KEY = "portfolio-certifications-card-view";
 
 export type CertificationCardViewMode = "row" | "grid";

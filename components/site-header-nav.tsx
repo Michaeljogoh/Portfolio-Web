@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ResumeCvButton } from "@/components/resume-cv-button";
+import type { ResumeDownload } from "@/lib/resume";
 
 const nav = [
   { href: "/", label: "Home" },
@@ -77,7 +79,11 @@ function NavLink({
   );
 }
 
-export function SiteHeaderNav() {
+export function SiteHeaderNav({
+  resumeDownloads,
+}: {
+  resumeDownloads: ResumeDownload[];
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -136,15 +142,7 @@ export function SiteHeaderNav() {
             </span>
             <ThemeToggle />
           </div>
-          <Button
-            variant="default"
-            className="mt-auto w-full font-mono text-xs border-primary/50"
-            asChild
-          >
-            <Link href="/contact" onClick={closeSheet}>
-              Resume / CV
-            </Link>
-          </Button>
+          <ResumeCvButton downloads={resumeDownloads} className="mt-auto w-full" />
         </SheetContent>
       </Sheet>
     </>

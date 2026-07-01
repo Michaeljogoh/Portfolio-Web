@@ -7,6 +7,16 @@ const globalForPrisma = globalThis as unknown as {
   pool?: Pool;
 };
 
+const PRISMA_MODEL_DELEGATES = [
+  "admin",
+  "project",
+  "skillCategory",
+  "skill",
+  "experience",
+  "certification",
+  "resumeFile",
+] as const;
+
 function createPrismaClient(): PrismaClient | undefined {
   const connectionString = process.env.DATABASE_URL?.trim();
   if (!connectionString) return undefined;
@@ -21,18 +31,33 @@ function createPrismaClient(): PrismaClient | undefined {
   return new PrismaClient({ adapter });
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+/** Dev hot-reload can keep a client generated before new models were added. */
+function isStalePrismaClient(client: PrismaClient): boolean {
+  return PRISMA_MODEL_DELEGATES.some((delegate) => !(delegate in client));
+}
 
-if (process.env.NODE_ENV !== "production" && prisma) {
-  globalForPrisma.prisma = prisma;
+function resolvePrismaClient(): PrismaClient | undefined {
+  const cached = globalForPrisma.prisma;
+  if (cached && !isStalePrismaClient(cached)) {
+    return cached;
+  }
+
+  const client = createPrismaClient();
+  if (client && process.env.NODE_ENV !== "production") {
+    globalForPrisma.prisma = client;
+  }
+  return client;
 }
 
 export function getPrisma(): PrismaClient {
-  if (!prisma) {
+  const client = resolvePrismaClient();
+  if (!client) {
     throw new Error("DATABASE_URL is not configured");
   }
-  return prisma;
+  return client;
 }
+
+export const prisma = resolvePrismaClient();
 
 export function isDatabaseConfigured(): boolean {
   return Boolean(process.env.DATABASE_URL?.trim());
