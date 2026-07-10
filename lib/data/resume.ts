@@ -1,14 +1,7 @@
-import { Prisma } from "@/generated/prisma/client";
 import { getPrisma, isDatabaseConfigured } from "@/lib/prisma";
+import { safeDatabaseQuery } from "@/lib/db-query";
 import type { ResumeDownload, ResumeFile, ResumeFormat } from "@/lib/resume";
 import { RESUME_FORMATS } from "@/lib/resume";
-
-function isMissingResumeTableError(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    (error.code === "P2021" || error.code === "P2022")
-  );
-}
 
 function mapResumeFile(row: {
   format: string;
@@ -35,16 +28,13 @@ export function getResumeDownloadPath(format: ResumeFormat): string {
 export async function getResumeFiles(): Promise<ResumeFile[]> {
   if (!isDatabaseConfigured()) return [];
 
-  try {
+  return safeDatabaseQuery("getResumeFiles", async () => {
     const rows = await getPrisma().resumeFile.findMany({
       where: { format: { in: [...RESUME_FORMATS] } },
       orderBy: { format: "asc" },
     });
     return rows.map(mapResumeFile);
-  } catch (error) {
-    if (isMissingResumeTableError(error)) return [];
-    throw error;
-  }
+  }, []);
 }
 
 export async function getResumeFile(
@@ -52,13 +42,10 @@ export async function getResumeFile(
 ): Promise<ResumeFile | null> {
   if (!isDatabaseConfigured()) return null;
 
-  try {
+  return safeDatabaseQuery("getResumeFile", async () => {
     const row = await getPrisma().resumeFile.findUnique({ where: { format } });
     return row ? mapResumeFile(row) : null;
-  } catch (error) {
-    if (isMissingResumeTableError(error)) return null;
-    throw error;
-  }
+  }, null);
 }
 
 export async function getResumeDownloads(): Promise<ResumeDownload[]> {

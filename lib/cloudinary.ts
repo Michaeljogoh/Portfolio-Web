@@ -1,20 +1,15 @@
 import { v2 as cloudinary, type UploadApiOptions } from "cloudinary";
 import type { ProjectMedia } from "@/lib/project-media";
 import type { ResumeFormat } from "@/lib/resume";
+import {
+  projectMediaFromCloudinaryUpload,
+  validateProjectMediaFile,
+} from "@/lib/cloudinary-project-media";
 
-const IMAGE_MAX_BYTES = 10 * 1024 * 1024;
-const VIDEO_MAX_BYTES = 100 * 1024 * 1024;
+export { validateProjectMediaFile } from "@/lib/cloudinary-project-media";
+
 const LOGO_MAX_BYTES = 5 * 1024 * 1024;
 const RESUME_MAX_BYTES = 10 * 1024 * 1024;
-
-const IMAGE_MIME = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-]);
-
-const VIDEO_MIME = new Set(["video/mp4", "video/webm", "video/quicktime"]);
 
 const LOGO_MIME = new Set([
   "image/jpeg",
@@ -35,9 +30,6 @@ const EXT_TO_MIME: Record<string, string> = {
   webp: "image/webp",
   gif: "image/gif",
   svg: "image/svg+xml",
-  mp4: "video/mp4",
-  webm: "video/webm",
-  mov: "video/quicktime",
   pdf: "application/pdf",
   docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 };
@@ -108,27 +100,38 @@ function getCloudinary() {
   return cloudinary;
 }
 
-export function validateProjectMediaFile(file: File): {
-  ok: true;
-  resourceType: "image" | "video";
-} | { ok: false; error: string } {
-  const mime = resolveFileMime(file);
+export type ProjectMediaUploadSignature = {
+  cloudName: string;
+  apiKey: string;
+  timestamp: number;
+  signature: string;
+  folder: string;
+  uploadUrl: string;
+};
 
-  if (IMAGE_MIME.has(mime)) {
-    if (file.size > IMAGE_MAX_BYTES) {
-      return { ok: false, error: "Image must be 10 MB or smaller." };
-    }
-    return { ok: true, resourceType: "image" };
-  }
-  if (VIDEO_MIME.has(mime)) {
-    if (file.size > VIDEO_MAX_BYTES) {
-      return { ok: false, error: "Video must be 100 MB or smaller." };
-    }
-    return { ok: true, resourceType: "video" };
-  }
+export function createProjectMediaUploadSignature(): ProjectMediaUploadSignature {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME!;
+  const folder = getUploadFolder();
+  const timestamp = Math.round(Date.now() / 1000);
+  const paramsToSign = {
+    asset_folder: folder,
+    folder,
+    timestamp,
+    use_asset_folder_as_public_id_prefix: "true",
+  };
+
+  const signature = cloudinary.utils.api_sign_request(
+    paramsToSign,
+    process.env.CLOUDINARY_API_SECRET!,
+  );
+
   return {
-    ok: false,
-    error: "Unsupported file type. Use JPG, PNG, WebP, GIF, MP4, WebM, or MOV.",
+    cloudName,
+    apiKey: process.env.CLOUDINARY_API_KEY!,
+    timestamp,
+    signature,
+    folder,
+    uploadUrl: `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
   };
 }
 
@@ -219,38 +222,11 @@ export async function uploadProjectMediaFile(
   const result = await uploadBufferToFolder(buffer, getUploadFolder(), {
     resource_type: "auto",
   });
-  const cld = getCloudinary();
 
-  if (result.resource_type === "video") {
-    const posterUrl = cld.url(result.public_id, {
-      resource_type: "video",
-      format: "jpg",
-      transformation: [{ start_offset: "0", width: 1200, crop: "limit" }],
-    });
-
-    return {
-      type: "video",
-      url: result.secure_url,
-      publicId: result.public_id,
-      width: result.width,
-      height: result.height,
-      format: result.format,
-      duration: result.duration,
-      posterUrl,
-      provider: "cloudinary",
-      playback: { loop: true, muted: true, autoplay: true },
-    };
-  }
-
-  return {
-    type: "image",
-    url: result.secure_url,
-    publicId: result.public_id,
-    width: result.width,
-    height: result.height,
-    format: result.format,
-    provider: "cloudinary",
-  };
+  return projectMediaFromCloudinaryUpload(
+    result,
+    process.env.CLOUDINARY_CLOUD_NAME!,
+  );
 }
 
 export async function destroyProjectMedia(media: ProjectMedia): Promise<void> {

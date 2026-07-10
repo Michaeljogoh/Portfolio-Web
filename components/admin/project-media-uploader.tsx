@@ -11,7 +11,8 @@ import {
   type ProjectMedia,
 } from "@/lib/project-media";
 import { buildProjectImageSrc } from "@/lib/cloudinary-url";
-import { parseApiError, toastError } from "@/lib/admin-toast";
+import { uploadProjectMediaDirect } from "@/lib/cloudinary-direct-upload";
+import { toastError } from "@/lib/admin-toast";
 
 type ProjectMediaUploaderProps = {
   value: ProjectMedia;
@@ -36,22 +37,14 @@ export function ProjectMediaUploader({
     if (!file) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
 
     try {
-      const res = await fetch("/api/admin/projects/media/upload", {
-        method: "POST",
-        body: formData,
-      });
-      if (!res.ok) {
-        toastError(await parseApiError(res));
-        return;
-      }
-      const data = (await res.json()) as { media: ProjectMedia };
-      onChange(data.media);
-    } catch {
-      toastError("Upload failed. Try again.");
+      const media = await uploadProjectMediaDirect(file);
+      onChange(media);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Upload failed. Try again.";
+      toastError(message);
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -124,6 +117,9 @@ export function ProjectMediaUploader({
           <Trash2 className="size-3.5" />
           Reset placeholder
         </Button>
+        <span className="font-mono text-[10px] uppercase text-muted-foreground">
+          Images ≤10 MB · videos ≤100 MB
+        </span>
         <span className="font-mono text-[10px] uppercase text-muted-foreground">
           {value.type} · {getProjectMediaUrl(value)}
         </span>
