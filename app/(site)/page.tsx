@@ -112,7 +112,7 @@ export default function Home() {
             </div>
           }
           scope={
-            <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
+            <p className="text-sm leading-relaxed  md:text-base">
               5+ years shipping secure, scalable systems: backend services and
               APIs first, full-stack product work when the problem needs it, and
               DevOps on{" "}

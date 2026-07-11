@@ -61,7 +61,7 @@ function NavLink({
         "relative transition-colors",
         active
           ? "text-primary"
-          : "text-muted-foreground hover:text-primary",
+          : "hover:text-primary",
         className,
       )}
     >

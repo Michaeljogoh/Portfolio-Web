@@ -13,7 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,6 +32,11 @@ import {
   isFeaturedCategory,
 } from "@/lib/project-categories";
 import { ProjectMedia } from "@/components/project-media";
+import {
+  ProjectCategoryBadges,
+  ProjectSkillBadges,
+} from "@/components/projects/project-badges";
+import { ProjectFeatureRow } from "@/components/projects/project-feature-row";
 import { PAGE_SIZE } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 
@@ -67,42 +71,6 @@ export type ProjectCardViewMode = "row" | "grid";
 type Props = {
   projects: Project[];
 };
-
-function ProjectCategoryBadges({ project }: { project: Project }) {
-  return (
-    <div className="flex flex-wrap gap-1.5 sm:gap-2">
-      {project.categories.map((cid) => (
-        <Badge
-          key={cid}
-          variant="outline"
-          className={
-            cid === "ai-automation-workflows"
-              ? "border-primary bg-primary/10 font-mono text-[10px] uppercase tracking-tight text-foreground"
-              : "font-mono text-[10px] uppercase tracking-tight border-primary/30 text-muted-foreground"
-          }
-        >
-          {getProjectCategoryLabel(cid)}
-        </Badge>
-      ))}
-    </div>
-  );
-}
-
-function ProjectTagBadges({ project }: { project: Project }) {
-  return (
-    <div className="flex flex-wrap gap-1.5 sm:gap-2">
-      {project.tags.map((tag) => (
-        <Badge
-          key={tag}
-          variant="secondary"
-          className="font-mono text-[11px] sm:text-xs"
-        >
-          {tag}
-        </Badge>
-      ))}
-    </div>
-  );
-}
 
 function ProjectCardLinks({
   project,
@@ -376,10 +344,10 @@ export function ProjectsFilteredGrid({ projects }: Props) {
               className="h-8 gap-1.5 px-2.5 font-mono text-xs sm:px-3"
               onClick={() => setCardView("row")}
               aria-pressed={cardView === "row"}
-              title="Compact rows — short image, medium width"
+              title="Feature rows with alternating media layout"
             >
               <LayoutList className="size-3.5 shrink-0" aria-hidden />
-              <span className="hidden sm:inline">Rows</span>
+              <span className="hidden sm:inline">Features</span>
             </Button>
             <Button
               type="button"
@@ -418,64 +386,15 @@ export function ProjectsFilteredGrid({ projects }: Props) {
         <>
           <div ref={resultsAnchorRef} className="scroll-mt-24" aria-hidden />
           {cardView === "row" ? (
-            <div className="flex w-full flex-col gap-5">
+            <div className="flex w-full flex-col divide-y divide-border/50">
               <AnimatePresence mode="popLayout">
-                {pagedFiltered.map((project) => {
-                  const cardKey = `${project.title}-${page}`;
-                  const cardClassName =
-                    "group grid min-h-0 w-full grid-cols-1 overflow-hidden rounded-none border-border bg-card p-0 transition-all duration-300 hover:border-primary/50 sm:min-h-64 sm:grid-cols-[minmax(16rem,min(48%,28rem))_minmax(0,1fr)] sm:grid-rows-1 sm:items-stretch";
-                  const content = (
-                    <>
-                      <ProjectMedia
-                        media={project.media}
-                        alt={project.title}
-                        wrapperClassName="relative aspect-video min-h-48 w-full border-b border-border bg-primary sm:aspect-auto sm:h-full sm:min-h-full sm:w-full sm:border-b-0 sm:border-r"
-                      />
-                      <div className="flex min-h-0 min-w-0 flex-col gap-3 p-4 sm:gap-3 sm:p-5">
-                        <div className="space-y-2">
-                          <CardTitle className="text-xl font-display leading-tight transition-colors group-hover:text-primary sm:text-2xl">
-                            {project.title}
-                          </CardTitle>
-                          <ProjectCategoryBadges project={project} />
-                          <ProjectTagBadges project={project} />
-                        </div>
-                        <CardDescription className="text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
-                          {project.description}
-                        </CardDescription>
-                        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3">
-                          <ProjectCardLinks
-                            project={project}
-                            className="text-xs sm:text-sm"
-                          />
-                        </div>
-                      </div>
-                    </>
-                  );
-
-                  if (prefersReducedMotion) {
-                    return (
-                      <Card key={cardKey} className={cardClassName}>
-                        {content}
-                      </Card>
-                    );
-                  }
-
-                  return (
-                    <MotionCard
-                      key={cardKey}
-                      layout
-                      variants={cardMotion}
-                      initial="hidden"
-                      whileInView={ready ? "visible" : "hidden"}
-                      viewport={{ once: true, amount: 0.2 }}
-                      exit="exit"
-                      transition={{ duration: DURATION.scroll, ease: EASE_OUT }}
-                      className={cardClassName}
-                    >
-                      {content}
-                    </MotionCard>
-                  );
-                })}
+                {pagedFiltered.map((project, index) => (
+                  <ProjectFeatureRow
+                    key={`${project.title}-${page}`}
+                    project={project}
+                    index={index}
+                  />
+                ))}
               </AnimatePresence>
             </div>
           ) : (
@@ -484,17 +403,23 @@ export function ProjectsFilteredGrid({ projects }: Props) {
                 {pagedFiltered.map((project) => {
                   const cardKey = `${project.title}-${page}`;
                   const cardClassName =
-                    "pt-2 group grid grid-rows-subgrid row-span-3 content-start items-start gap-0 overflow-hidden rounded-none border-border bg-card p-0 py-0 shadow-none transition-all duration-300 hover:border-primary/50";
+                    "group grid grid-rows-subgrid row-span-3 content-start items-start gap-0 overflow-hidden rounded-none border-border bg-card p-0 shadow-none transition-[border-color,box-shadow] duration-300 hover:border-primary/40 hover:shadow-[0_16px_48px_-28px] hover:shadow-primary/10";
                   const content = (
                     <>
-                      <ProjectMedia media={project.media} alt={project.title} />
+                      <div className="border-b border-border/70 p-3">
+                        <ProjectMedia
+                          media={project.media}
+                          alt={project.title}
+                          variant="feature"
+                        />
+                      </div>
                       <div className="grid gap-4">
                         <CardHeader className="grid gap-4 mt-2">
                           <CardTitle className="text-2xl font-display transition-colors group-hover:text-primary">
                             {project.title}
                           </CardTitle>
                           <ProjectCategoryBadges project={project} />
-                          <ProjectTagBadges project={project} />
+                          <ProjectSkillBadges project={project} />
                         </CardHeader>
                         <CardContent className="pt-0">
                           <CardDescription className="text-base">

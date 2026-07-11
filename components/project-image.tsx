@@ -13,7 +13,7 @@ interface ProjectImageProps {
 }
 
 const imageClassName =
-  "object-cover group-hover:scale-105 transition-transform duration-500 grayscale mix-blend-luminosity dark:mix-blend-darken";
+  "object-cover transition-transform duration-500 group-hover:scale-[1.03]";
 
 export function ProjectImage({
   src,
@@ -26,7 +26,7 @@ export function ProjectImage({
   return (
     <div
       className={cn(
-        "bg-primary relative overflow-hidden transition-opacity duration-500",
+        "relative overflow-hidden bg-muted/40 transition-opacity duration-500",
         wrapperClassName ?? "aspect-square border-b border-border",
         loaded ? "opacity-100" : "opacity-0",
       )}
@@ -48,7 +48,7 @@ export function ProjectImage({
           className={cn("absolute inset-0 h-full w-full", imageClassName)}
         />
       )}
-      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="pointer-events-none absolute inset-0 bg-black/3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:bg-white/4" />
     </div>
   );
 }
