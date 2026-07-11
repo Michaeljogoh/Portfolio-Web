@@ -2,12 +2,12 @@ export const PROJECT_CATEGORIES = [
   { id: "backend-apis", label: "Backend & APIs" },
   { id: "frontend-ui", label: "Frontend & UI" },
   { id: "devops-cloud", label: "DevOps & Cloud" },
-  { id: "cybersecurity", label: "Cybersecurity" },
-  { id: "ai-automation-workflows", label: "AI Automation & Workflows" },
-  { id: "ai-ml", label: "AI & ML" },
+  // { id: "cybersecurity", label: "Cybersecurity" },
+  // { id: "ai-automation-workflows", label: "AI Automation & Workflows" },
+  // { id: "ai-ml", label: "AI & ML" },
   // { id: "mobile", label: "Mobile" },
   // { id: "data-engineering", label: "Data Engineering" },
-  { id: "web3-blockchain", label: "Web3 / Blockchain" },
+  // { id: "web3-blockchain", label: "Web3 / Blockchain" },
 ] as const;
 
 export type ProjectCategoryId = (typeof PROJECT_CATEGORIES)[number]["id"];

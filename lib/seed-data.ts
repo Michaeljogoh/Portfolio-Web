@@ -15,13 +15,7 @@ export const projects: Project[] = [
     description:
       "AI-powered job tracking: automated resumes, cover letters, and applications across 10+ boards; follow-ups and LinkedIn outreach. Next.js, Node.js, MongoDB, Puppeteer scraping, real-time analytics, Stripe subscriptions, and a responsive UI.",
     tags: ["Next.js", "Node.js", "MongoDB", "Puppeteer", "Stripe", "AI"],
-    categories: [
-      "ai-automation-workflows",
-      "ai-ml",
-      "backend-apis",
-      "frontend-ui",
-      "devops-cloud",
-    ],
+    categories: ["backend-apis", "frontend-ui", "devops-cloud"],
     media: projectMediaFromUrl("/project-placeholder-1.jpg"),
     link: "#",
     repo: SOCIAL.github,
@@ -41,7 +35,7 @@ export const projects: Project[] = [
     description:
       "Additional work spans Express and Nest backends, HIPAA/GDPR-aware systems, CI/CD with Jenkins and GitLab, and infrastructure automation with Terraform and Ansible.",
     tags: ["Node.js", "DevOps", "Security", "APIs"],
-    categories: ["backend-apis", "devops-cloud", "cybersecurity"],
+    categories: ["backend-apis", "devops-cloud"],
     media: projectMediaFromUrl("/project-placeholder-3.jpg"),
     link: SOCIAL.github,
     repo: SOCIAL.github,

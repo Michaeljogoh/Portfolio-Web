@@ -1,20 +1,8 @@
 "use client";
 
 import { useMemo, useState, useCallback, useEffect, useRef } from "react";
-import Link from "next/link";
+import { AnimatePresence } from "framer-motion";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  ExternalLink,
   Search,
   LayoutList,
   LayoutGrid,
@@ -27,9 +15,11 @@ import {
   type CertificationCategoryId,
   getCertificationCategoryLabel,
 } from "@/lib/cert-categories";
-import { ProjectImage } from "@/components/project-image";
+import { CertificationFeatureRow } from "@/components/certifications/certification-feature-row";
+import { CertificationGridCard } from "@/components/certifications/certification-grid-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { PAGE_SIZE } from "@/lib/pagination";
-import { cn } from "@/lib/utils";
 
 function matchesSearch(cert: Certification, query: string): boolean {
   const q = query.trim().toLowerCase();
@@ -63,64 +53,6 @@ export type CertificationCardViewMode = "row" | "grid";
 type Props = {
   certifications: Certification[];
 };
-
-function CertCategoryBadges({ cert }: { cert: Certification }) {
-  return (
-    <div className="flex flex-wrap gap-1.5 sm:gap-2">
-      {cert.categories.map((cid) => (
-        <Badge
-          key={cid}
-          variant="outline"
-          className="font-mono text-[10px] uppercase tracking-tight border-primary/30 text-muted-foreground"
-        >
-          {getCertificationCategoryLabel(cid)}
-        </Badge>
-      ))}
-    </div>
-  );
-}
-
-function CertTagBadges({ cert }: { cert: Certification }) {
-  return (
-    <div className="flex flex-wrap gap-1.5 sm:gap-2">
-      {cert.tags.map((tag) => (
-        <Badge
-          key={tag}
-          variant="secondary"
-          className="font-mono text-[11px] sm:text-xs"
-        >
-          {tag}
-        </Badge>
-      ))}
-    </div>
-  );
-}
-
-function CredentialLink({
-  cert,
-  className,
-}: {
-  cert: Certification;
-  className?: string;
-}) {
-  return (
-    <Link
-      href={cert.credentialUrl}
-      target={cert.credentialUrl.startsWith("http") ? "_blank" : undefined}
-      rel={
-        cert.credentialUrl.startsWith("http")
-          ? "noopener noreferrer"
-          : undefined
-      }
-      className={cn(
-        "font-display transition-colors hover:text-primary flex items-center gap-2",
-        className,
-      )}
-    >
-      CREDENTIAL <ExternalLink className="size-3" />
-    </Link>
-  );
-}
 
 export function CertificationsFilteredGrid({
   certifications: allCerts,
@@ -338,10 +270,10 @@ export function CertificationsFilteredGrid({
               className="h-8 gap-1.5 px-2.5 font-mono text-xs sm:px-3"
               onClick={() => setCardView("row")}
               aria-pressed={cardView === "row"}
-              title="Compact rows — image and details side by side"
+              title="Feature rows with alternating badge layout"
             >
               <LayoutList className="size-3.5 shrink-0" aria-hidden />
-              <span className="hidden sm:inline">Rows</span>
+              <span className="hidden sm:inline">Features</span>
             </Button>
             <Button
               type="button"
@@ -350,7 +282,7 @@ export function CertificationsFilteredGrid({
               className="h-8 gap-1.5 px-2.5 font-mono text-xs sm:px-3"
               onClick={() => setCardView("grid")}
               aria-pressed={cardView === "grid"}
-              title="Grid tiles — large square image"
+              title="Grid tiles — badge image with details below"
             >
               <LayoutGrid className="size-3.5 shrink-0" aria-hidden />
               <span className="hidden sm:inline">Grid</span>
@@ -380,79 +312,27 @@ export function CertificationsFilteredGrid({
         <>
           <div ref={resultsAnchorRef} className="scroll-mt-24" aria-hidden />
           {cardView === "row" ? (
-            <div className="flex w-full flex-col gap-5">
-              {pagedFiltered.map((cert) => (
-                <Card
-                  key={`${cert.title}-${cert.issued}`}
-                  className="group grid min-h-0 w-full grid-cols-1 overflow-hidden rounded-none border-border bg-card p-0 transition-all duration-300 hover:border-primary/50 sm:min-h-[11rem] sm:grid-cols-[minmax(12rem,min(42%,22rem))_minmax(0,1fr)] sm:grid-rows-1 sm:items-stretch"
-                >
-                  <ProjectImage
-                    src={cert.image}
-                    alt={cert.title}
-                    wrapperClassName="relative aspect-video min-h-0 w-full border-b border-border bg-primary sm:aspect-auto sm:h-full sm:min-h-0 sm:w-full sm:border-b-0 sm:border-r"
+            <div className="flex w-full flex-col divide-y divide-border/50">
+              <AnimatePresence mode="popLayout">
+                {pagedFiltered.map((cert, index) => (
+                  <CertificationFeatureRow
+                    key={`${cert.title}-${page}`}
+                    cert={cert}
+                    index={index}
                   />
-                  <div className="flex min-h-0 min-w-0 flex-col gap-3 p-4 sm:gap-3 sm:p-5">
-                    <div className="space-y-2">
-                      <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground sm:text-xs">
-                        {cert.issuer}
-                        <span className="text-border"> · </span>
-                        <span className="tabular-nums text-foreground/80">
-                          {cert.issued}
-                        </span>
-                      </p>
-                      <CardTitle className="text-xl font-display leading-tight transition-colors group-hover:text-primary sm:text-2xl">
-                        {cert.title}
-                      </CardTitle>
-                      <CertCategoryBadges cert={cert} />
-                      <CertTagBadges cert={cert} />
-                    </div>
-                    <CardDescription className="text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
-                      {cert.excerpt}
-                    </CardDescription>
-                    <div className="mt-auto flex flex-wrap items-center justify-end gap-3 border-t border-border/60 pt-3">
-                      <CredentialLink
-                        cert={cert}
-                        className="text-xs sm:text-sm"
-                      />
-                    </div>
-                  </div>
-                </Card>
-              ))}
+                ))}
+              </AnimatePresence>
             </div>
           ) : (
             <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-6">
-              {pagedFiltered.map((cert) => (
-                <Card
-                  key={`${cert.title}-${cert.issued}`}
-                  className="pt-2 group grid grid-rows-subgrid row-span-3 content-start items-start gap-0 overflow-hidden rounded-none border-border bg-card p-0 py-0 shadow-none transition-all duration-300 hover:border-primary/50"
-                >
-                  <ProjectImage src={cert.image} alt={cert.title} />
-                  <div className="grid gap-4">
-                    <CardHeader className="grid gap-4 mt-2">
-                      <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                        {cert.issuer}
-                        <span className="text-border"> · </span>
-                        <span className="tabular-nums text-foreground/80">
-                          {cert.issued}
-                        </span>
-                      </p>
-                      <CardTitle className="text-2xl font-display transition-colors group-hover:text-primary">
-                        {cert.title}
-                      </CardTitle>
-                      <CertCategoryBadges cert={cert} />
-                      <CertTagBadges cert={cert} />
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <CardDescription className="text-base">
-                        {cert.excerpt}
-                      </CardDescription>
-                    </CardContent>
-                  </div>
-                  <CardFooter className="flex justify-end py-4">
-                    <CredentialLink cert={cert} className="text-sm" />
-                  </CardFooter>
-                </Card>
-              ))}
+              <AnimatePresence mode="popLayout">
+                {pagedFiltered.map((cert) => (
+                  <CertificationGridCard
+                    key={`${cert.title}-${page}`}
+                    cert={cert}
+                  />
+                ))}
+              </AnimatePresence>
             </div>
           )}
           {totalPages > 1 ? (
