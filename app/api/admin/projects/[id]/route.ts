@@ -3,6 +3,7 @@ import { destroyProjectMedia } from "@/lib/cloudinary";
 import { getPrisma } from "@/lib/prisma";
 import { parseProjectMedia } from "@/lib/project-media";
 import { projectSchema } from "@/lib/validations/admin";
+import { revalidatePublicSection } from "@/lib/revalidate";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -46,6 +47,7 @@ export async function PATCH(request: Request, { params }: Params) {
       }
     }
 
+    revalidatePublicSection("projects");
     return NextResponse.json(project);
   } catch {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -66,6 +68,7 @@ export async function DELETE(_request: Request, { params }: Params) {
       () => undefined,
     );
 
+    revalidatePublicSection("projects");
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

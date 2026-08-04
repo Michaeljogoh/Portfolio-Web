@@ -7,6 +7,7 @@ import {
 import { getPrisma } from "@/lib/prisma";
 import { isResumeFormat } from "@/lib/resume";
 import { jsonError } from "@/lib/api-auth";
+import { revalidateSiteLayout } from "@/lib/revalidate";
 
 export async function POST(request: Request) {
   if (!isCloudinaryConfigured()) {
@@ -59,6 +60,7 @@ export async function POST(request: Request) {
       await destroyRawFile(existing.publicId).catch(() => undefined);
     }
 
+    revalidateSiteLayout();
     return NextResponse.json({
       file: {
         format: record.format,

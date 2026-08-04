@@ -14,8 +14,8 @@ export function SiteHeader({ resumeDownloads }: SiteHeaderProps) {
     <Container
       component="header"
       siteWidth="inset"
-      wrapperClassName="fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border"
-      className="flex items-center justify-between h-16 uppercase gap-4"
+      wrapperClassName="fixed top-0 left-0 w-full z-50 pt-3 md:pt-4"
+      className="flex h-14 items-center gap-4 rounded-full border border-border bg-card/90 pl-5 pr-2 uppercase shadow-lg shadow-black/5 backdrop-blur-md md:h-16  md:pr-2 xl:mx-auto xl:max-w-7xl dark:shadow-black/40"
     >
       <Link
         href="/"
@@ -24,13 +24,11 @@ export function SiteHeader({ resumeDownloads }: SiteHeaderProps) {
         Michael<span className="text-primary">_</span>Jogoh
       </Link>
 
-      <div className="flex flex-1 items-center justify-end gap-2 md:min-w-0">
-        <SiteHeaderNav resumeDownloads={resumeDownloads} />
-        <ThemeToggle />
-        <ResumeCvButton
-          downloads={resumeDownloads}
-          className="hidden md:inline-flex"
-        />
+      <SiteHeaderNav resumeDownloads={resumeDownloads} />
+
+      <div className="hidden shrink-0 items-center gap-1 lg:flex">
+        <ThemeToggle className="rounded-full" />
+        <ResumeCvButton downloads={resumeDownloads} />
       </div>
     </Container>
   );

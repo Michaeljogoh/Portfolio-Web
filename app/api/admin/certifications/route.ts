@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
 import { certificationSchema } from "@/lib/validations/admin";
+import { revalidatePublicSection } from "@/lib/revalidate";
 
 export async function GET() {
   const items = await getPrisma().certification.findMany({
@@ -28,5 +29,6 @@ export async function POST(request: Request) {
       sortOrder: data.sortOrder ?? (maxOrder._max.sortOrder ?? -1) + 1,
     },
   });
+  revalidatePublicSection("certifications");
   return NextResponse.json(item, { status: 201 });
 }

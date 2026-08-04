@@ -63,10 +63,7 @@ export function ResumeCvButton({ downloads, className }: ResumeCvButtonProps) {
   }
 
   return (
-    <div
-      ref={rootRef}
-      className={cn("relative", className?.includes("w-full") && "w-full")}
-    >
+    <div ref={rootRef} className={cn("relative", className)}>
       <Button
         type="button"
         variant="default"

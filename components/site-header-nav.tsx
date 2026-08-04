@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Menu } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -47,10 +46,8 @@ function NavLink({
   label,
   className,
   onNavigate,
-  showIndicator = false,
-}: NavLinkProps & { showIndicator?: boolean }) {
+}: NavLinkProps) {
   const active = isNavActive(pathname, href);
-  const prefersReducedMotion = useReducedMotion();
 
   return (
     <Link
@@ -58,23 +55,14 @@ function NavLink({
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "relative transition-colors",
+        "transition-colors",
         active
-          ? "text-primary"
-          : "hover:text-primary",
+          ? "font-bold text-primary"
+          : "text-muted-foreground hover:text-foreground",
         className,
       )}
     >
       {label}
-      {active && showIndicator && !prefersReducedMotion ? (
-        <motion.span
-          layoutId="nav-active-indicator"
-          className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"
-          transition={{ type: "spring", stiffness: 380, damping: 30 }}
-        />
-      ) : active ? (
-        <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary" />
-      ) : null}
     </Link>
   );
 }
@@ -92,7 +80,7 @@ export function SiteHeaderNav({
   return (
     <>
       <nav
-        className="hidden md:flex flex-1 min-w-0 justify-center gap-6 lg:gap-8 text-xs lg:text-sm font-medium"
+        className="hidden lg:flex flex-1 min-w-0 justify-center gap-5 xl:gap-7 text-xs xl:text-sm font-medium"
         aria-label="Primary"
       >
         {nav.map(({ href, label }) => (
@@ -102,7 +90,6 @@ export function SiteHeaderNav({
             href={href}
             label={label}
             className="shrink-0"
-            showIndicator
           />
         ))}
       </nav>
@@ -112,7 +99,7 @@ export function SiteHeaderNav({
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="ml-auto shrink-0 rounded-full lg:hidden"
             aria-label="Open menu"
           >
             <Menu className="size-5" />
