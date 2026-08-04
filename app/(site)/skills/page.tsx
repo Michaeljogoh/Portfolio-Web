@@ -7,7 +7,6 @@ import {
   AnimatedPageHeader,
   PageHeaderMeta,
 } from "@/components/motion/animated-page-header";
-export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Skills",

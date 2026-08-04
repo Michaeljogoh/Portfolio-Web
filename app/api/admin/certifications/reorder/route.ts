@@ -3,6 +3,7 @@ import { getPrisma } from "@/lib/prisma";
 import { reorderItems } from "@/lib/reorder";
 import { reorderSchema } from "@/lib/validations/admin";
 import { jsonError } from "@/lib/api-auth";
+import { revalidatePublicSection } from "@/lib/revalidate";
 
 export async function PATCH(request: Request) {
   const body = await request.json();
@@ -17,6 +18,7 @@ export async function PATCH(request: Request) {
     const items = await prisma.certification.findMany({
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     });
+    revalidatePublicSection("certifications");
     return NextResponse.json(items);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Reorder failed.";

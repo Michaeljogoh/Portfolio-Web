@@ -7,9 +7,6 @@ import {
   AnimatedPageHeader,
   PageHeaderMeta,
 } from "@/components/motion/animated-page-header";
-import { Reveal } from "@/components/motion/reveal";
-
-export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Certifications",
@@ -59,9 +56,7 @@ export default async function CertificationsPage() {
         }
       />
 
-      <Reveal delay={0.1}>
-        <CertificationsFilteredGrid certifications={certifications} />
-      </Reveal>
+      <CertificationsFilteredGrid certifications={certifications} />
     </Container>
   );
 }

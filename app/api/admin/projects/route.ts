@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
 import { projectSchema } from "@/lib/validations/admin";
+import { revalidatePublicSection } from "@/lib/revalidate";
 
 export async function GET() {
   const projects = await getPrisma().project.findMany({
@@ -26,5 +27,6 @@ export async function POST(request: Request) {
       sortOrder: data.sortOrder ?? (maxOrder._max.sortOrder ?? -1) + 1,
     },
   });
+  revalidatePublicSection("projects");
   return NextResponse.json(project, { status: 201 });
 }

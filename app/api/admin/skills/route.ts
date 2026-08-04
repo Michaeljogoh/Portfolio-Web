@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
 import { resolveSkillIconUrl } from "@/lib/skill-icon-resolver";
 import { skillSchema } from "@/lib/validations/admin";
+import { revalidatePublicSection } from "@/lib/revalidate";
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -31,5 +32,6 @@ export async function POST(request: Request) {
       sortOrder: data.sortOrder ?? (maxOrder._max.sortOrder ?? -1) + 1,
     },
   });
+  revalidatePublicSection("skills");
   return NextResponse.json(skill, { status: 201 });
 }

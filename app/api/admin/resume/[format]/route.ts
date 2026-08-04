@@ -3,6 +3,7 @@ import { destroyRawFile } from "@/lib/cloudinary";
 import { getPrisma } from "@/lib/prisma";
 import { isResumeFormat } from "@/lib/resume";
 import { jsonError } from "@/lib/api-auth";
+import { revalidateSiteLayout } from "@/lib/revalidate";
 
 type Params = { params: Promise<{ format: string }> };
 
@@ -26,5 +27,6 @@ export async function DELETE(_request: Request, { params }: Params) {
 
   await prisma.resumeFile.delete({ where: { format } });
 
+  revalidateSiteLayout();
   return NextResponse.json({ ok: true });
 }
