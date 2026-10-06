@@ -14,14 +14,15 @@ const jetBrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl =
-  process.env.VERCEL_ENV === "preview"
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+  ? process.env.NEXT_PUBLIC_SITE_URL
+  : process.env.VERCEL_ENV === "preview"
     ? `https://${process.env.VERCEL_BRANCH_URL}`
     : process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : "http://localhost:3000";
 
-const title = "Michael Jogoh — Full Stack Engineer";
+const title = "Michael Jogoh | Full Stack Engineer";
 const description =
   "Full-stack engineer building secure, scalable web apps with JavaScript, TypeScript, Node.js, Python, React, and Next.js. Based in Lagos, Nigeria.";
 
@@ -32,12 +33,20 @@ export const metadata: Metadata = {
     template: `%s · Michael Jogoh`,
   },
   description,
+  applicationName: "Michael Jogoh",
+  authors: [{ name: "Michael Jogoh" }],
   openGraph: {
+    type: "website",
+    locale: "en_US",
     title,
     description,
-    url: "./",
-    siteName: title,
-    images: "/og.jpg",
+    url: "/",
+    siteName: "Michael Jogoh",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
   },
 };
 
