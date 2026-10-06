@@ -36,7 +36,7 @@ export default function Home() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                 </span>
-                LAGOS, NG // OPEN TO REMOTE ROLES
+                 OPEN TO REMOTE ROLES
               </div>
               <div className="flex items-center gap-1 sm:gap-2">
                 <Link

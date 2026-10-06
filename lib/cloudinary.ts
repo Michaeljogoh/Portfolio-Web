@@ -298,3 +298,14 @@ export async function destroyRawFile(publicId: string): Promise<void> {
   const cld = getCloudinary();
   await cld.uploader.destroy(publicId, { resource_type: "raw" });
 }
+
+/**
+ * Signed API download URL for a raw resume. Works even when the account blocks
+ * public delivery of PDF/ZIP files (401 "deny or ACL failure").
+ */
+export function getRawFileDownloadUrl(publicId: string): string {
+  return getCloudinary().utils.private_download_url(publicId, "", {
+    resource_type: "raw",
+    type: "upload",
+  });
+}

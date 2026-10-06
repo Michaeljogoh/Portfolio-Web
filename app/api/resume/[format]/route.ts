@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getRawFileDownloadUrl, isCloudinaryConfigured } from "@/lib/cloudinary";
 import { getResumeFile } from "@/lib/data/resume";
 import { isResumeFormat } from "@/lib/resume";
 
@@ -8,6 +9,8 @@ const CONTENT_TYPE = {
   pdf: "application/pdf",
   docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 } as const;
+
+export const dynamic = "force-dynamic";
 
 export async function GET(_request: Request, { params }: Params) {
   const { format } = await params;
@@ -21,8 +24,18 @@ export async function GET(_request: Request, { params }: Params) {
     return NextResponse.json({ error: "Resume not found." }, { status: 404 });
   }
 
-  const upstream = await fetch(file.url);
-  if (!upstream.ok || !upstream.body) {
+  let upstream: Response | null = null;
+  try {
+    const sourceUrl =
+      file.publicId && isCloudinaryConfigured()
+        ? getRawFileDownloadUrl(file.publicId)
+        : file.url;
+    upstream = await fetch(sourceUrl);
+  } catch {
+    upstream = null;
+  }
+
+  if (!upstream?.ok || !upstream.body) {
     return NextResponse.json(
       { error: "Unable to fetch resume file." },
       { status: 502 },
